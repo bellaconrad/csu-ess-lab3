@@ -1,0 +1,2654 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Lab 3: COVID-19</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="lab-03_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lab-03_files/libs/quarto-html/quarto.js"></script>
+<script src="lab-03_files/libs/quarto-html/popper.min.js"></script>
+<script src="lab-03_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="lab-03_files/libs/quarto-html/anchor.min.js"></script>
+<link href="lab-03_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lab-03_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="lab-03_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="lab-03_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="lab-03_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="lab-03_files/libs/tabwid-1.1.3/tabwid.css" rel="stylesheet">
+<script src="lab-03_files/libs/tabwid-1.1.3/tabwid.js"></script>
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Lab 3: COVID-19</h1>
+<p class="subtitle lead">ESS 330</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(zoo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'zoo'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    as.Date, as.Date.numeric</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(flextable)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+✔ lubridate 1.9.4     ✔ tidyr     1.3.1
+✔ purrr     1.0.2     </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ purrr::compose() masks flextable::compose()
+✖ dplyr::filter()  masks stats::filter()
+✖ dplyr::lag()     masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(skimr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="question-1" class="level1">
+<h1>Question 1</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>url <span class="ot">=</span> <span class="st">"https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv"</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>covid_data <span class="ot">=</span> <span class="fu">read_csv</span>(url)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 2502832 Columns: 6
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (3): county, state, fips
+dbl  (2): cases, deaths
+date (1): date
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+</div>
+</section>
+<section id="question-2" class="level1">
+<h1>Question 2</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>txt <span class="ot">&lt;-</span> <span class="st">"2022-02-01"</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(txt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "character"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>date_example <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(txt)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(date_example)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Date"</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>my.date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2022-02-01"</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>my.state <span class="ot">&lt;-</span> <span class="st">"Colorado"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>colorado <span class="ot">&lt;-</span> covid_data <span class="sc">%&gt;%</span> </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(state <span class="sc">==</span> my.state) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(county) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(date) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">new_cases =</span> cases <span class="sc">-</span> <span class="fu">lag</span>(cases),</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">new_deaths =</span> deaths <span class="sc">-</span> <span class="fu">lag</span>(deaths)) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(colorado, date <span class="sc">==</span> my.date) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(cases, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">Date =</span> date, <span class="at">County =</span> county, <span class="at">Cases =</span> cases) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="at">caption =</span> <span class="st">"Most Total Cases"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-cfd2e752{}.cl-cfcce852{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-cfcf14a6{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-cfcf14a7{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-cfcf2e00{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cfcf2e01{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cfcf2e0a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cfcf2e0b{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cfcf2e0c{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cfcf2e14{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-cfd2e752"><thead><tr style="overflow-wrap:break-word;"><th class="cl-cfcf2e00"><p class="cl-cfcf14a6"><span class="cl-cfcce852">Date</span></p></th><th class="cl-cfcf2e01"><p class="cl-cfcf14a7"><span class="cl-cfcce852">County</span></p></th><th class="cl-cfcf2e00"><p class="cl-cfcf14a6"><span class="cl-cfcce852">Cases</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-cfcf2e0a"><p class="cl-cfcf14a6"><span class="cl-cfcce852">2022-02-01</span></p></td><td class="cl-cfcf2e0b"><p class="cl-cfcf14a7"><span class="cl-cfcce852">El Paso</span></p></td><td class="cl-cfcf2e0a"><p class="cl-cfcf14a6"><span class="cl-cfcce852">170,673</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-cfcf2e0a"><p class="cl-cfcf14a6"><span class="cl-cfcce852">2022-02-01</span></p></td><td class="cl-cfcf2e0b"><p class="cl-cfcf14a7"><span class="cl-cfcce852">Denver</span></p></td><td class="cl-cfcf2e0a"><p class="cl-cfcf14a6"><span class="cl-cfcce852">159,022</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-cfcf2e0a"><p class="cl-cfcf14a6"><span class="cl-cfcce852">2022-02-01</span></p></td><td class="cl-cfcf2e0b"><p class="cl-cfcf14a7"><span class="cl-cfcce852">Arapahoe</span></p></td><td class="cl-cfcf2e0a"><p class="cl-cfcf14a6"><span class="cl-cfcce852">144,255</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-cfcf2e0a"><p class="cl-cfcf14a6"><span class="cl-cfcce852">2022-02-01</span></p></td><td class="cl-cfcf2e0b"><p class="cl-cfcf14a7"><span class="cl-cfcce852">Adams</span></p></td><td class="cl-cfcf2e0a"><p class="cl-cfcf14a6"><span class="cl-cfcce852">126,768</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-cfcf2e0c"><p class="cl-cfcf14a6"><span class="cl-cfcce852">2022-02-01</span></p></td><td class="cl-cfcf2e14"><p class="cl-cfcf14a7"><span class="cl-cfcce852">Jefferson</span></p></td><td class="cl-cfcf2e0c"><p class="cl-cfcf14a6"><span class="cl-cfcce852">113,240</span></p></td></tr></tbody></table></div>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(colorado, date <span class="sc">==</span> my.date) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(cases, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">Date =</span> date, <span class="at">County =</span> county, <span class="at">Cases =</span> new_cases) <span class="sc">%&gt;%</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flextable</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="at">caption =</span> <span class="st">"Most New Cases"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-cfdd21d6{}.cl-cfd90754{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-cfdab1ee{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-cfdab1ef{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-cfdac436{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cfdac437{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cfdac438{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cfdac440{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cfdac441{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cfdac44a{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-cfdd21d6"><thead><tr style="overflow-wrap:break-word;"><th class="cl-cfdac436"><p class="cl-cfdab1ee"><span class="cl-cfd90754">Date</span></p></th><th class="cl-cfdac437"><p class="cl-cfdab1ef"><span class="cl-cfd90754">County</span></p></th><th class="cl-cfdac436"><p class="cl-cfdab1ee"><span class="cl-cfd90754">Cases</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-cfdac438"><p class="cl-cfdab1ee"><span class="cl-cfd90754">2022-02-01</span></p></td><td class="cl-cfdac440"><p class="cl-cfdab1ef"><span class="cl-cfd90754">El Paso</span></p></td><td class="cl-cfdac438"><p class="cl-cfdab1ee"><span class="cl-cfd90754">630</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-cfdac438"><p class="cl-cfdab1ee"><span class="cl-cfd90754">2022-02-01</span></p></td><td class="cl-cfdac440"><p class="cl-cfdab1ef"><span class="cl-cfd90754">Denver</span></p></td><td class="cl-cfdac438"><p class="cl-cfdab1ee"><span class="cl-cfd90754">389</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-cfdac438"><p class="cl-cfdab1ee"><span class="cl-cfd90754">2022-02-01</span></p></td><td class="cl-cfdac440"><p class="cl-cfdab1ef"><span class="cl-cfd90754">Arapahoe</span></p></td><td class="cl-cfdac438"><p class="cl-cfdab1ee"><span class="cl-cfd90754">401</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-cfdac438"><p class="cl-cfdab1ee"><span class="cl-cfd90754">2022-02-01</span></p></td><td class="cl-cfdac440"><p class="cl-cfdab1ef"><span class="cl-cfd90754">Adams</span></p></td><td class="cl-cfdac438"><p class="cl-cfdab1ee"><span class="cl-cfd90754">326</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-cfdac441"><p class="cl-cfdab1ee"><span class="cl-cfd90754">2022-02-01</span></p></td><td class="cl-cfdac44a"><p class="cl-cfdab1ef"><span class="cl-cfd90754">Jefferson</span></p></td><td class="cl-cfdac441"><p class="cl-cfdab1ee"><span class="cl-cfd90754">291</span></p></td></tr></tbody></table></div>
+</div>
+</div>
+</section>
+<section id="question-3" class="level1">
+<h1>Question 3</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>pop_url <span class="ot">&lt;-</span> <span class="st">'https://www2.census.gov/programs-surveys/popest/datasets/2020-2023/counties/totals/co-est2023-alldata.csv'</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>pop_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(pop_url) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(COUNTY <span class="sc">!=</span> <span class="st">"000"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">fips =</span> <span class="fu">sprintf</span>(<span class="st">"%05s"</span>, <span class="fu">paste0</span>(STATE, COUNTY))) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(fips, <span class="fu">contains</span>(<span class="st">"NAME"</span>), <span class="fu">contains</span>(<span class="st">"2021"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 3195 Columns: 67
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (5): SUMLEV, STATE, COUNTY, STNAME, CTYNAME
+dbl (62): REGION, DIVISION, ESTIMATESBASE2020, POPESTIMATE2020, POPESTIMATE2...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(pop_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "fips"                  "STNAME"                "CTYNAME"              
+ [4] "POPESTIMATE2021"       "NPOPCHG2021"           "BIRTHS2021"           
+ [7] "DEATHS2021"            "NATURALCHG2021"        "INTERNATIONALMIG2021" 
+[10] "DOMESTICMIG2021"       "NETMIG2021"            "RESIDUAL2021"         
+[13] "GQESTIMATES2021"       "RBIRTH2021"            "RDEATH2021"           
+[16] "RNATURALCHG2021"       "RINTERNATIONALMIG2021" "RDOMESTICMIG2021"     
+[19] "RNETMIG2021"          </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(pop_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 3144   19</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(pop_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 3144</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(pop_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tibble [3,144 × 19] (S3: tbl_df/tbl/data.frame)
+ $ fips                 : chr [1:3144] "01001" "01003" "01005" "01007" ...
+ $ STNAME               : chr [1:3144] "Alabama" "Alabama" "Alabama" "Alabama" ...
+ $ CTYNAME              : chr [1:3144] "Autauga County" "Baldwin County" "Barbour County" "Bibb County" ...
+ $ POPESTIMATE2021      : num [1:3144] 59203 239439 24533 22359 59079 ...
+ $ NPOPCHG2021          : num [1:3144] 288 6212 -436 171 -28 ...
+ $ BIRTHS2021           : num [1:3144] 686 2337 270 240 654 ...
+ $ DEATHS2021           : num [1:3144] 696 2948 390 325 875 ...
+ $ NATURALCHG2021       : num [1:3144] -10 -611 -120 -85 -221 -49 -70 -593 -200 -188 ...
+ $ INTERNATIONALMIG2021 : num [1:3144] 15 105 0 1 9 1 5 12 22 7 ...
+ $ DOMESTICMIG2021      : num [1:3144] 242 6972 -313 254 141 ...
+ $ NETMIG2021           : num [1:3144] 257 7077 -313 255 150 ...
+ $ RESIDUAL2021         : num [1:3144] 41 -254 -3 1 43 4 5 86 21 2 ...
+ $ GQESTIMATES2021      : num [1:3144] 484 3351 2248 1994 616 ...
+ $ RBIRTH2021           : num [1:3144] 11.62 9.89 10.91 10.78 11.07 ...
+ $ RDEATH2021           : num [1:3144] 11.8 12.5 15.8 14.6 14.8 ...
+ $ RNATURALCHG2021      : num [1:3144] -0.169 -2.585 -4.848 -3.816 -3.74 ...
+ $ RINTERNATIONALMIG2021: num [1:3144] 0.254 0.4443 0 0.0449 0.1523 ...
+ $ RDOMESTICMIG2021     : num [1:3144] 4.1 29.5 -12.65 11.4 2.39 ...
+ $ RNETMIG2021          : num [1:3144] 4.35 29.95 -12.65 11.45 2.54 ...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(pop_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 3,144
+Columns: 19
+$ fips                  &lt;chr&gt; "01001", "01003", "01005", "01007", "01009", "01…
+$ STNAME                &lt;chr&gt; "Alabama", "Alabama", "Alabama", "Alabama", "Ala…
+$ CTYNAME               &lt;chr&gt; "Autauga County", "Baldwin County", "Barbour Cou…
+$ POPESTIMATE2021       &lt;dbl&gt; 59203, 239439, 24533, 22359, 59079, 10143, 18890…
+$ NPOPCHG2021           &lt;dbl&gt; 288, 6212, -436, 171, -28, -86, -135, -565, -163…
+$ BIRTHS2021            &lt;dbl&gt; 686, 2337, 270, 240, 654, 111, 227, 1250, 392, 2…
+$ DEATHS2021            &lt;dbl&gt; 696, 2948, 390, 325, 875, 160, 297, 1843, 592, 4…
+$ NATURALCHG2021        &lt;dbl&gt; -10, -611, -120, -85, -221, -49, -70, -593, -200…
+$ INTERNATIONALMIG2021  &lt;dbl&gt; 15, 105, 0, 1, 9, 1, 5, 12, 22, 7, 20, 1, 0, -1,…
+$ DOMESTICMIG2021       &lt;dbl&gt; 242, 6972, -313, 254, 141, -42, -75, -70, -6, 28…
+$ NETMIG2021            &lt;dbl&gt; 257, 7077, -313, 255, 150, -41, -70, -58, 16, 29…
+$ RESIDUAL2021          &lt;dbl&gt; 41, -254, -3, 1, 43, 4, 5, 86, 21, 2, 18, 7, 8, …
+$ GQESTIMATES2021       &lt;dbl&gt; 484, 3351, 2248, 1994, 616, 1578, 285, 5407, 856…
+$ RBIRTH2021            &lt;dbl&gt; 11.615503, 9.888589, 10.908650, 10.775136, 11.06…
+$ RDEATH2021            &lt;dbl&gt; 11.78483, 12.47392, 15.75694, 14.59133, 14.80717…
+$ RNATURALCHG2021       &lt;dbl&gt; -0.1693222, -2.5853351, -4.8482890, -3.8161941, …
+$ RINTERNATIONALMIG2021 &lt;dbl&gt; 0.25398330, 0.44428836, 0.00000000, 0.04489640, …
+$ RDOMESTICMIG2021      &lt;dbl&gt; 4.0975973, 29.5007468, -12.6459537, 11.4036860, …
+$ RNETMIG2021           &lt;dbl&gt; 4.3515806, 29.9450352, -12.6459537, 11.4485824, …</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(pop_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: There was 1 warning in `dplyr::summarize()`.
+ℹ In argument: `dplyr::across(tidyselect::any_of(variable_names),
+  mangled_skimmers$funs)`.
+ℹ In group 0: .
+Caused by warning:
+! There were 2 warnings in `dplyr::summarize()`.
+The first warning was:
+ℹ In argument: `dplyr::across(tidyselect::any_of(variable_names),
+  mangled_skimmers$funs)`.
+Caused by warning in `grepl()`:
+! unable to translate 'Do&lt;f1&gt;a Ana County' to a wide string
+ℹ Run `dplyr::last_dplyr_warnings()` to see the 1 remaining warning.</code></pre>
+</div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Name</td>
+<td style="text-align: left;">pop_data</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Number of rows</td>
+<td style="text-align: left;">3144</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Number of columns</td>
+<td style="text-align: left;">19</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">_______________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Column type frequency:</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">16</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">________________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Group variables</td>
+<td style="text-align: left;">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: character</strong></p>
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 13%">
+<col style="width: 19%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 8%">
+<col style="width: 12%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">min</th>
+<th style="text-align: right;">max</th>
+<th style="text-align: right;">empty</th>
+<th style="text-align: right;">n_unique</th>
+<th style="text-align: right;">whitespace</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">fips</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3144</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">STNAME</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CTYNAME</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">46</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1882</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 8%">
+<col style="width: 11%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 9%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 9%">
+<col style="width: 4%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">sd</th>
+<th style="text-align: right;">p0</th>
+<th style="text-align: right;">p25</th>
+<th style="text-align: right;">p50</th>
+<th style="text-align: right;">p75</th>
+<th style="text-align: right;">p100</th>
+<th style="text-align: left;">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">POPESTIMATE2021</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">105613.54</td>
+<td style="text-align: right;">332727.20</td>
+<td style="text-align: right;">54.00</td>
+<td style="text-align: right;">10819.50</td>
+<td style="text-align: right;">25808.00</td>
+<td style="text-align: right;">68448.50</td>
+<td style="text-align: right;">9809462.00</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NPOPCHG2021</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">166.04</td>
+<td style="text-align: right;">5550.85</td>
+<td style="text-align: right;">-183351.00</td>
+<td style="text-align: right;">-95.00</td>
+<td style="text-align: right;">22.00</td>
+<td style="text-align: right;">300.50</td>
+<td style="text-align: right;">54379.00</td>
+<td style="text-align: left;">▁▁▁▇▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BIRTHS2021</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1140.10</td>
+<td style="text-align: right;">3596.98</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">113.00</td>
+<td style="text-align: right;">271.50</td>
+<td style="text-align: right;">731.25</td>
+<td style="text-align: right;">94553.00</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">DEATHS2021</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1093.65</td>
+<td style="text-align: right;">2996.50</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">159.00</td>
+<td style="text-align: right;">364.00</td>
+<td style="text-align: right;">868.00</td>
+<td style="text-align: right;">88930.00</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NATURALCHG2021</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">46.45</td>
+<td style="text-align: right;">990.90</td>
+<td style="text-align: right;">-6505.00</td>
+<td style="text-align: right;">-138.00</td>
+<td style="text-align: right;">-54.00</td>
+<td style="text-align: right;">-3.00</td>
+<td style="text-align: right;">26137.00</td>
+<td style="text-align: left;">▇▂▁▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">INTERNATIONALMIG2021</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">119.60</td>
+<td style="text-align: right;">645.33</td>
+<td style="text-align: right;">-170.00</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">5.00</td>
+<td style="text-align: right;">28.00</td>
+<td style="text-align: right;">15109.00</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DOMESTICMIG2021</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">6038.70</td>
+<td style="text-align: right;">-194712.00</td>
+<td style="text-align: right;">-55.00</td>
+<td style="text-align: right;">59.00</td>
+<td style="text-align: right;">370.50</td>
+<td style="text-align: right;">42990.00</td>
+<td style="text-align: left;">▁▁▁▁▇</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NETMIG2021</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">119.60</td>
+<td style="text-align: right;">5668.93</td>
+<td style="text-align: right;">-182605.00</td>
+<td style="text-align: right;">-45.00</td>
+<td style="text-align: right;">69.00</td>
+<td style="text-align: right;">394.00</td>
+<td style="text-align: right;">48504.00</td>
+<td style="text-align: left;">▁▁▁▇▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RESIDUAL2021</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">267.70</td>
+<td style="text-align: right;">-6706.00</td>
+<td style="text-align: right;">-4.00</td>
+<td style="text-align: right;">3.00</td>
+<td style="text-align: right;">17.00</td>
+<td style="text-align: right;">1819.00</td>
+<td style="text-align: left;">▁▁▁▇▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">GQESTIMATES2021</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2518.26</td>
+<td style="text-align: right;">6718.06</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">161.00</td>
+<td style="text-align: right;">569.50</td>
+<td style="text-align: right;">2131.50</td>
+<td style="text-align: right;">180225.00</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RBIRTH2021</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">10.67</td>
+<td style="text-align: right;">2.40</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">9.25</td>
+<td style="text-align: right;">10.50</td>
+<td style="text-align: right;">11.93</td>
+<td style="text-align: right;">30.73</td>
+<td style="text-align: left;">▁▇▂▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RDEATH2021</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">13.61</td>
+<td style="text-align: right;">3.82</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">11.02</td>
+<td style="text-align: right;">13.63</td>
+<td style="text-align: right;">16.02</td>
+<td style="text-align: right;">50.42</td>
+<td style="text-align: left;">▂▇▁▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RNATURALCHG2021</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">-2.94</td>
+<td style="text-align: right;">4.64</td>
+<td style="text-align: right;">-50.42</td>
+<td style="text-align: right;">-5.82</td>
+<td style="text-align: right;">-3.06</td>
+<td style="text-align: right;">-0.20</td>
+<td style="text-align: right;">21.27</td>
+<td style="text-align: left;">▁▁▂▇▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RINTERNATIONALMIG2021</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.47</td>
+<td style="text-align: right;">0.83</td>
+<td style="text-align: right;">-2.05</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">0.57</td>
+<td style="text-align: right;">15.76</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RDOMESTICMIG2021</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4.75</td>
+<td style="text-align: right;">15.70</td>
+<td style="text-align: right;">-120.73</td>
+<td style="text-align: right;">-3.39</td>
+<td style="text-align: right;">3.51</td>
+<td style="text-align: right;">11.97</td>
+<td style="text-align: right;">116.03</td>
+<td style="text-align: left;">▁▁▇▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RNETMIG2021</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">5.21</td>
+<td style="text-align: right;">15.57</td>
+<td style="text-align: right;">-119.57</td>
+<td style="text-align: right;">-3.01</td>
+<td style="text-align: right;">4.00</td>
+<td style="text-align: right;">12.35</td>
+<td style="text-align: right;">117.83</td>
+<td style="text-align: left;">▁▁▇▁▁</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># There are 19 columns and 3144 rows. 3 of the columns are characters and 16 are numeric. The death column matches the COVID death column, but this one is specifically for the year 2021.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>co_pop <span class="ot">&lt;-</span> pop_data <span class="sc">%&gt;%</span> </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(STNAME <span class="sc">==</span> <span class="st">"Colorado"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(CTYNAME)</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>pop_range <span class="ot">&lt;-</span> <span class="fu">range</span>(co_pop<span class="sc">$</span><span class="st">`</span><span class="at">POPESTIMATE2021</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Range of populations in Colorado counties in 2021:"</span>, pop_range)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Range of populations in Colorado counties in 2021: 741 737287</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>pop_and_covid <span class="ot">&lt;-</span> colorado <span class="sc">%&gt;%</span> </span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(pop_data, <span class="at">by =</span> <span class="st">"fips"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">cumulative_cases =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(cases) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(POPESTIMATE2021), cases <span class="sc">/</span> POPESTIMATE2021, <span class="cn">NA</span>),</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_cases =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(new_cases) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(POPESTIMATE2021), new_cases <span class="sc">/</span> POPESTIMATE2021, <span class="cn">NA</span>),</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_deaths =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(new_deaths) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(POPESTIMATE2021), new_deaths <span class="sc">/</span> POPESTIMATE2021, <span class="cn">NA</span>)</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>most_cum_cases <span class="ot">&lt;-</span> pop_and_covid <span class="sc">%&gt;%</span> </span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">==</span> my.date) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(cumulative_cases, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(date, county, cases, deaths, cumulative_cases)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="fu">flextable</span>(most_cum_cases) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_header_labels</span>(</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">cumulative_cases =</span> <span class="st">"Cumulative Cases per capita"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">"Top 5 Colorado Counties with Most Cumulative Cases Per Capita "</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>a flextable object.
+col_keys: `date`, `county`, `cases`, `deaths`, `cumulative_cases` 
+header has 1 row(s) 
+body has 5 row(s) 
+original dataset sample: 
+        date  county cases deaths cumulative_cases
+1 2022-02-01 Crowley  2935     28        0.5117698
+2 2022-02-01    Bent  2199     46        0.4118749
+3 2022-02-01  Pitkin  5946      6        0.3429659
+4 2022-02-01 Lincoln  1874      9        0.3424082
+5 2022-02-01   Logan  6402    104        0.3047701</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>most_new_cases <span class="ot">&lt;-</span> pop_and_covid <span class="sc">%&gt;%</span> </span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">==</span> my.date) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(new_cases, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(date, county, cases, deaths, new_cases)</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="fu">flextable</span>(most_new_cases) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_header_labels</span>(</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_cases =</span> <span class="st">"New Cases per capita"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_caption</span>(<span class="st">"Top 5 Colorado Counties with Most New Cases Per Capita "</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>a flextable object.
+col_keys: `date`, `county`, `cases`, `deaths`, `new_cases` 
+header has 1 row(s) 
+body has 5 row(s) 
+original dataset sample: 
+        date     county cases deaths   new_cases
+1 2022-02-01    Crowley  2935     28 0.009764603
+2 2022-02-01       Bent  2199     46 0.004120622
+3 2022-02-01   Sedgwick   441      8 0.003869304
+4 2022-02-01 Washington   937     26 0.002875924
+5 2022-02-01 Las Animas  3183     38 0.002651039</code></pre>
+</div>
+</div>
+</section>
+<section id="question-4" class="level1">
+<h1>Question 4</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>latest_date <span class="ot">&lt;-</span> <span class="fu">max</span>(pop_and_covid<span class="sc">$</span>date, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>pop_and_covid <span class="sc">%&gt;%</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">&gt;=</span> (latest_date <span class="sc">-</span> <span class="dv">13</span>)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 896 × 27
+   date       county     state   fips   cases deaths new_cases new_deaths STNAME
+   &lt;date&gt;     &lt;chr&gt;      &lt;chr&gt;   &lt;chr&gt;  &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt; &lt;chr&gt; 
+ 1 2022-04-30 Adams      Colora… 08001 136577   1351         0          0 Color…
+ 2 2022-04-30 Alamosa    Colora… 08003   4538     61         0          0 Color…
+ 3 2022-04-30 Arapahoe   Colora… 08005 156486   1252         0          0 Color…
+ 4 2022-04-30 Archuleta  Colora… 08007   2907     16         0          0 Color…
+ 5 2022-04-30 Baca       Colora… 08009    848      8         0          0 Color…
+ 6 2022-04-30 Bent       Colora… 08011   2545     47         0          0 Color…
+ 7 2022-04-30 Boulder    Colora… 08013  65998    389         0          0 Color…
+ 8 2022-04-30 Broomfield Colora… 08014  13663    115         0          0 Color…
+ 9 2022-04-30 Chaffee    Colora… 08015   4676     44         0          0 Color…
+10 2022-04-30 Cheyenne   Colora… 08017    322      9         0          0 Color…
+# ℹ 886 more rows
+# ℹ 18 more variables: CTYNAME &lt;chr&gt;, POPESTIMATE2021 &lt;dbl&gt;, NPOPCHG2021 &lt;dbl&gt;,
+#   BIRTHS2021 &lt;dbl&gt;, DEATHS2021 &lt;dbl&gt;, NATURALCHG2021 &lt;dbl&gt;,
+#   INTERNATIONALMIG2021 &lt;dbl&gt;, DOMESTICMIG2021 &lt;dbl&gt;, NETMIG2021 &lt;dbl&gt;,
+#   RESIDUAL2021 &lt;dbl&gt;, GQESTIMATES2021 &lt;dbl&gt;, RBIRTH2021 &lt;dbl&gt;,
+#   RDEATH2021 &lt;dbl&gt;, RNATURALCHG2021 &lt;dbl&gt;, RINTERNATIONALMIG2021 &lt;dbl&gt;,
+#   RDOMESTICMIG2021 &lt;dbl&gt;, RNETMIG2021 &lt;dbl&gt;, cumulative_cases &lt;dbl&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>last_14_days <span class="ot">&lt;-</span> pop_and_covid <span class="sc">%&gt;%</span> </span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(county) <span class="sc">%&gt;%</span> </span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_new_cases_14d =</span> <span class="fu">sum</span>(new_cases, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">population =</span> <span class="fu">first</span>(POPESTIMATE2021)</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cases_per_100k =</span> (total_new_cases_14d<span class="sc">/</span>population) <span class="sc">*</span><span class="dv">100000</span>)</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>watchlist_count <span class="ot">&lt;-</span> last_14_days <span class="sc">%&gt;%</span> </span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(cases_per_100k<span class="sc">&gt;</span><span class="dv">100</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nrow</span>()</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>top_5_counties <span class="ot">&lt;-</span> last_14_days <span class="sc">%&gt;%</span> </span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(<span class="at">order_by =</span> cases_per_100k, <span class="at">n =</span> <span class="dv">5</span>)</span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(last_14_days)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 65 × 4
+   county     total_new_cases_14d population cases_per_100k
+   &lt;chr&gt;                    &lt;dbl&gt;      &lt;dbl&gt;          &lt;dbl&gt;
+ 1 Adams                    0.263     523544         0.0502
+ 2 Alamosa                  0.275      16579         1.66  
+ 3 Arapahoe                 0.241     656855         0.0367
+ 4 Archuleta                0.212      13806         1.53  
+ 5 Baca                     0.245       3490         7.01  
+ 6 Bent                     0.479       5339         8.98  
+ 7 Boulder                  0.209     327084         0.0640
+ 8 Broomfield               0.186      75411         0.246 
+ 9 Chaffee                  0.240      19741         1.22  
+10 Cheyenne                 0.186       1719        10.8   
+# ℹ 55 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"Counties with cases per 100k &gt; 100:"</span>, watchlist_count))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Counties with cases per 100k &gt; 100: 0"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(top_5_counties)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+  county   total_new_cases_14d population cases_per_100k
+  &lt;chr&gt;                  &lt;dbl&gt;      &lt;dbl&gt;          &lt;dbl&gt;
+1 San Juan               0.273        741           36.8
+2 Mineral                0.258        929           27.8
+3 Hinsdale               0.168        773           21.8
+4 Kiowa                  0.230       1454           15.8
+5 Cheyenne               0.186       1719           10.8</code></pre>
+</div>
+</div>
+</section>
+<section id="question-5" class="level1">
+<h1>Question 5</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>CO_death_analysis <span class="ot">&lt;-</span> pop_and_covid <span class="sc">%&gt;%</span> </span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(state <span class="sc">==</span> <span class="st">"Colorado"</span>, <span class="fu">year</span>(date) <span class="sc">==</span> <span class="dv">2021</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(county) <span class="sc">%&gt;%</span> </span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">DEATHS2021 =</span> <span class="fu">first</span>(DEATHS2021),</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">deaths =</span> <span class="fu">first</span>(deaths)) <span class="sc">%&gt;%</span> </span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">percentcoviddeath =</span> (deaths<span class="sc">/</span>DEATHS2021)<span class="sc">*</span><span class="dv">100</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">high_impact_counties =</span> (percentcoviddeath <span class="sc">&gt;=</span> <span class="dv">20</span>))</span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(CO_death_analysis, <span class="fu">aes</span>(<span class="at">x =</span> county, <span class="at">y =</span> percentcoviddeath)) <span class="sc">+</span></span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"darkred"</span>) <span class="sc">+</span></span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Colorado Counties where over 20% of Deaths were Caused by COVID-19 in 2021"</span>,</span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"County"</span>,</span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Percentage of Total Deaths Caused by COVID-19"</span>) <span class="sc">+</span></span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">size =</span> <span class="dv">6</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-03_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="question-6" class="level1">
+<h1>Question 6</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>state_covid <span class="ot">=</span> covid_data <span class="sc">%&gt;%</span> </span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(date, state) <span class="sc">%&gt;%</span> </span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">cases =</span> <span class="fu">sum</span>(cases)) <span class="sc">%&gt;%</span> </span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(state <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">'New York'</span>, <span class="st">"Ohio"</span>, <span class="st">'Colorado'</span>, <span class="st">"Alabama"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(state) <span class="sc">%&gt;%</span> </span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">newCases =</span> cases <span class="sc">-</span> <span class="fu">lag</span>(cases),</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">roll =</span> zoo<span class="sc">::</span><span class="fu">rollmean</span>(newCases, <span class="at">k =</span> <span class="dv">7</span>, <span class="at">align =</span> <span class="st">"right"</span>, <span class="at">fill =</span> <span class="cn">NA</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'date'. You can override using the
+`.groups` argument.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rollmean</span>(state_covid<span class="sc">$</span>newCases, <span class="at">k =</span> <span class="dv">3</span>, <span class="at">fill =</span> <span class="cn">NA</span>, <span class="at">align =</span> <span class="st">"left"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   [1]           NA     3.333333           NA           NA           NA
+   [6]    13.000000     9.333333    22.333333    15.000000    20.666667
+  [11]     7.000000    19.000000           NA           NA           NA
+  [16]    12.000000    16.000000    20.333333    20.666667    20.000000
+  [21]    41.666667    41.666667           NA           NA           NA
+  [26]    44.000000    36.333333    13.000000    73.333333    75.666667
+  [31]    71.000000    19.000000    55.333333    55.333333    46.333333
+  [36]    14.000000    83.000000    85.333333    80.333333    15.000000
+  [41]   152.333333   154.666667   151.333333    20.666667   352.333333
+  [46]   356.000000   354.000000    37.333333   621.000000   622.000000
+  [51]   610.666667    48.000000  1022.000000  1029.000000  1008.666667
+  [56]    61.666667  1131.333333  1149.000000  1120.666667    73.333333
+  [61]  1653.000000  1679.000000  1653.333333    91.000000  1960.000000
+  [66]  1978.000000  1950.000000   110.000000  1680.666667  1705.333333
+  [71]  1689.666667   146.000000  2577.000000  2576.666667  2569.333333
+  [76]   213.666667  2146.333333  2149.000000  2067.333333   188.000000
+  [81]  2030.666667  2089.333333  2015.333333   228.000000  3059.333333
+  [86]  3119.666667  3047.666667   208.666667  2210.000000  2259.666667
+  [91]  2214.000000   229.666667  2717.000000  2767.333333  2680.333333
+  [96]   227.333333  3040.333333  3111.666667  3027.333333   243.666667
+ [101]  2872.666667  2952.666667  2888.000000   297.666667  3180.000000
+ [106]  3244.333333  3205.333333   358.000000  3682.666667  3730.666667
+ [111]  3611.666667   299.333333  4254.333333  4364.333333  4303.000000
+ [116]   337.000000  2902.000000  2934.000000  2863.666667   230.333333
+ [121]  3230.333333  3311.000000  3301.000000   285.333333  2921.000000
+ [126]  2968.000000  2982.666667   286.666667  3365.000000  3386.666667
+ [131]  3424.666667   417.666667  3884.000000  3892.000000  3766.333333
+ [136]   280.666667  3757.333333  3822.666667  3804.666667   334.333333
+ [141]  3599.000000  3638.333333  3617.666667   367.666667  3055.333333
+ [146]  3066.333333  3003.666667   321.333333  2386.000000  2435.333333
+ [151]  2355.333333   256.000000  2600.000000  2652.333333  2665.000000
+ [156]   310.666667  4127.333333  4201.666667  4143.000000   356.333333
+ [161]  3063.000000  3216.333333  3140.666667   387.666667  2690.666667
+ [166]  2865.666667  2792.000000   410.000000  2595.333333  2916.666667
+ [171]  2848.000000   530.666667  2225.333333  2625.333333  2584.666667
+ [176]   643.666667  1806.000000  2186.666667  2144.333333   635.666667
+ [181]  1638.000000  1823.666667  1804.333333   506.666667  2124.333333
+ [186]  2160.666667  2091.000000   332.666667  2315.666667  2434.000000
+ [191]  2370.666667   588.000000  3157.666667  3251.333333  2982.666667
+ [196]   458.000000  3860.666667  3937.666667  3769.666667   366.333333
+ [201]  2231.333333  2287.333333  2169.000000   286.000000  1519.666667
+ [206]  1601.000000  1550.000000   336.000000  1310.333333  1388.000000
+ [211]  1301.333333   353.333333  1778.000000  1897.666667  1798.333333
+ [216]   401.333333  1790.666667  1984.333333  1884.000000   468.000000
+ [221]  1519.666667  1683.000000  1637.333333   496.666667  1777.666667
+ [226]  1869.333333  1809.333333   426.000000  1461.666667  1562.333333
+ [231]  1500.666667   358.333333  1006.666667  1118.666667  1136.333333
+ [236]   447.333333  1028.000000  1084.666667  1017.000000   404.333333
+ [241]  1154.666667  1272.333333  1236.000000   502.000000  1475.000000
+ [246]  1541.666667  1473.333333   449.666667  1222.333333  1405.000000
+ [251]  1347.666667   572.666667  1182.000000  1314.000000  1205.000000
+ [256]   409.333333   895.666667   951.666667   934.000000   287.333333
+ [261]   694.333333   835.666667   869.666667   436.333333   682.666667
+ [266]   740.000000   715.333333   349.000000   899.333333   977.333333
+ [271]   998.000000   414.000000  1045.333333  1123.666667  1090.666667
+ [276]   434.000000  1141.666667  1248.666667  1217.666667   430.333333
+ [281]   961.000000  1034.000000   934.000000   307.333333   767.666667
+ [286]   885.000000   888.333333   343.000000   607.000000   678.666667
+ [291]   687.000000   366.666667   683.000000   752.333333   884.333333
+ [296]   496.333333   823.000000   759.000000   774.666667   412.666667
+ [301]   944.000000  1067.000000  1021.666667   427.333333   743.000000
+ [306]   866.666667   928.000000   527.333333   903.000000   947.666667
+ [311]   898.666667   383.333333   712.666667   770.666667   870.666667
+ [316]   375.666667   634.333333   653.666667   836.333333   509.000000
+ [321]   668.333333   623.333333   651.666667   377.666667   578.666667
+ [326]   595.666667   687.666667   424.000000   865.666667   858.333333
+ [331]   911.666667   487.666667   845.333333   895.333333   842.666667
+ [336]   487.000000   724.333333   771.000000   808.000000   447.000000
+ [341]   659.000000   621.000000   721.666667   420.000000   575.333333
+ [346]   538.333333   551.000000   306.333333   603.000000   646.000000
+ [351]   602.333333   239.333333   465.000000   585.666667   568.666667
+ [356]   321.000000   524.666667   614.333333   619.333333   353.333333
+ [361]   537.333333   591.000000   724.666667   455.000000   657.333333
+ [366]   556.333333   631.000000   321.000000   462.333333   431.666667
+ [371]   522.333333   324.000000   439.666667   418.333333   523.333333
+ [376]   340.666667   450.333333   393.000000   527.333333   347.666667
+ [381]   460.666667   409.333333   644.333333   472.333333   576.000000
+ [386]   433.666667   672.666667   489.666667   620.333333   472.000000
+ [391]   710.666667   502.000000   666.000000   510.333333   783.333333
+ [396]   517.000000   607.000000   369.000000   550.333333   375.333333
+ [401]   483.000000   406.666667   563.666667   403.666667   471.000000
+ [406]   402.333333   488.000000   355.000000   397.333333   401.333333
+ [411]   622.333333   511.333333   582.666667   518.000000   707.333333
+ [416]   594.000000   625.333333   563.000000   650.000000   439.333333
+ [421]   472.000000   466.666667   570.000000   397.666667   442.333333
+ [426]   467.000000   548.000000   381.333333   384.333333   483.000000
+ [431]   642.333333   520.000000   476.333333   458.666667   718.333333
+ [436]   606.333333   601.333333   489.666667   783.000000   699.333333
+ [441]   734.666667   651.333333   869.000000   728.666667   699.333333
+ [446]   702.666667   897.000000   704.333333   607.666667   580.000000
+ [451]   624.000000   486.333333   422.000000   587.333333  1070.666667
+ [456]   931.000000   776.666667   444.333333   666.000000   603.333333
+ [461]   510.333333   468.000000   706.000000   658.000000   619.666667
+ [466]   672.666667   951.000000   849.333333   781.333333   832.000000
+ [471]  1309.000000  1109.000000   981.666667   760.666667  1002.333333
+ [476]   793.666667   671.666667   648.000000   914.000000   739.000000
+ [481]   609.000000   568.000000   809.666667   703.000000   552.333333
+ [486]   512.333333   742.666667   704.333333   632.666667   646.333333
+ [491]   905.000000   864.333333   778.666667   812.000000  1393.333333
+ [496]  1302.666667  1073.000000   719.000000  1024.000000  1030.000000
+ [501]   910.000000   973.666667  1251.333333  1129.000000   863.000000
+ [506]   836.000000  1241.666667  1099.333333   873.000000   785.666667
+ [511]  1338.333333  1235.333333   962.333333   730.000000  1176.666667
+ [516]  1143.000000  1027.000000   837.666667  1289.000000  1144.333333
+ [521]  1041.666667   876.333333  1390.333333  1304.666667  1121.666667
+ [526]   878.000000  1353.333333  1295.000000  1124.333333  1016.333333
+ [531]  1533.333333  1408.000000  1099.000000   898.666667  1357.000000
+ [536]  1230.000000   885.666667   663.333333  1166.333333  1152.333333
+ [541]   955.333333   740.666667  1074.000000  1068.666667   941.666667
+ [546]   801.666667  1119.000000  1032.333333   918.666667   942.666667
+ [551]  1544.000000  1529.333333  1290.333333   972.000000  1349.000000
+ [556]  1308.666667  1080.000000  1002.333333  1481.000000  1478.000000
+ [561]  1207.333333   978.333333  1116.666667  1039.666667   737.666667
+ [566]   646.000000  1080.666667  1023.000000   931.000000   692.000000
+ [571]   989.333333  1017.333333   827.666667   850.666667  1090.333333
+ [576]  1067.000000   864.000000   857.333333  1362.333333  1276.333333
+ [581]  1070.666667   988.333333  1491.000000  1434.666667  1071.000000
+ [586]   928.333333  1267.000000  1189.333333   929.666667   697.000000
+ [591]  1259.000000  1155.000000  1022.666667   639.000000   897.333333
+ [596]   827.000000   693.000000   598.000000   838.333333   782.000000
+ [601]   720.000000   754.000000   947.000000   915.333333   747.333333
+ [606]   829.666667  1258.666667  1209.000000  1040.666667   783.333333
+ [611]  1189.666667  1107.666667   959.000000   790.666667  1265.333333
+ [616]  1162.000000   996.000000   803.333333  1053.666667   921.000000
+ [621]   660.666667   566.666667  1026.000000   956.666667   823.000000
+ [626]   555.333333   730.666667   699.000000   627.000000   715.000000
+ [631]   899.000000   796.666667   667.000000   829.333333   966.333333
+ [636]   862.666667   634.000000   769.666667   888.666667   758.333333
+ [641]   607.000000   733.333333  1042.000000   894.333333   763.333333
+ [646]   712.000000   902.666667   763.333333   594.000000   514.000000
+ [651]   597.666667   462.333333   394.666667   462.666667   847.333333
+ [656]   805.000000   767.333333   602.000000   880.000000   749.000000
+ [661]   670.666667   617.666667   851.666667   757.000000   637.333333
+ [666]   687.666667   968.000000   892.666667   754.333333   707.666667
+ [671]   883.333333   741.333333   610.666667   683.666667   766.000000
+ [676]   716.333333   537.000000   573.333333   956.000000   848.666667
+ [681]   771.000000   504.000000   595.000000   619.000000   545.666667
+ [686]   649.666667  1161.666667  1008.666667   916.666667   609.000000
+ [691]  1142.000000  1072.666667   972.666667   797.666667  1065.000000
+ [696]   952.666667   749.666667   794.333333  1211.666667  1056.000000
+ [701]   835.666667   673.000000  1065.666667   917.000000   748.000000
+ [706]   606.666667   818.000000   675.666667   584.666667   608.666667
+ [711]  1034.000000   924.666667   878.666667   843.666667   944.333333
+ [716]   783.333333   535.666667   713.666667   971.000000   830.333333
+ [721]   740.666667   840.333333  1113.666667   931.333333   770.666667
+ [726]   845.333333  1201.666667  1027.666667   850.000000   827.000000
+ [731]   883.666667   705.333333   501.333333   588.666667   720.333333
+ [736]   543.000000   460.333333   500.000000   645.333333   530.333333
+ [741]   456.666667   464.333333   674.666667   585.000000   557.333333
+ [746]   611.333333   898.000000   802.000000   729.666667   720.666667
+ [751]  1005.000000   854.666667   768.000000   802.000000  1014.666667
+ [756]   871.000000   740.666667   840.333333  1066.666667   893.666667
+ [761]   721.333333   630.666667   755.333333   644.000000   560.333333
+ [766]   685.333333   788.666667   774.333333   670.333333   770.333333
+ [771]   898.333333   807.000000   691.000000   726.333333   785.333333
+ [776]   749.333333   702.666667   835.000000  1022.000000   945.666667
+ [781]   854.333333   822.666667  1035.000000   909.666667   900.333333
+ [786]   783.666667   910.666667   767.666667   739.000000   727.000000
+ [791]   815.000000   756.000000   693.666667   706.333333   745.000000
+ [796]   758.666667   723.666667   684.000000   668.333333   629.333333
+ [801]   623.000000   734.333333   874.000000   838.333333   855.000000
+ [806]   834.333333  1465.333333  1401.333333  1374.000000   940.000000
+ [811]   997.333333   850.000000   802.000000   862.666667   950.333333
+ [816]   781.333333   699.000000   722.333333   776.666667   652.333333
+ [821]   664.333333   774.666667   800.000000   685.000000   750.000000
+ [826]   928.000000  1146.666667   961.333333   928.000000   905.666667
+ [831]  1042.666667   918.666667  1019.666667  1114.333333  1221.333333
+ [836]  1004.000000  1095.333333  1275.666667  1592.666667  1217.333333
+ [841]  1295.000000  1120.000000  1224.666667   802.000000   825.000000
+ [846]   875.666667   903.666667   708.333333   707.000000   878.000000
+ [851]   919.333333   775.666667   888.000000  1078.333333  1223.333333
+ [856]  1050.333333  1057.333333  1218.333333  1112.333333   919.000000
+ [861]  1056.000000  1383.333333  1621.333333  1303.666667  1321.666667
+ [866]  1438.333333  1498.000000  1293.333333  1162.666667  1261.000000
+ [871]  1206.666667   959.000000   888.000000  1046.333333  1056.000000
+ [876]   924.000000   837.666667  1069.666667  1193.000000  1154.000000
+ [881]  1141.000000  1251.000000  1207.333333  1007.333333   936.666667
+ [886]  1355.000000  1486.333333  1487.333333  1295.666667  1626.666667
+ [891]  1618.000000  1553.000000  1394.666667  1706.666667  1713.000000
+ [896]  1509.333333  1389.333333  1704.666667  1662.000000  1399.000000
+ [901]  1117.666667  1317.000000  1270.333333  1115.000000   927.333333
+ [906]  1253.333333  1293.000000  1373.000000  1161.000000  1485.000000
+ [911]  1454.000000  1480.000000  1484.666667  1891.333333  1928.333333
+ [916]  1716.666667  1471.000000  1816.000000  2635.333333  2568.333333
+ [921]  2305.333333  1860.666667  2171.333333  2266.666667  2113.333333
+ [926]  2279.333333  1998.333333  1896.666667  1488.333333  1898.333333
+ [931]  1636.333333  1740.000000  1367.666667  1750.666667  1474.333333
+ [936]  1552.000000  1511.333333  1976.000000  1924.000000  1760.333333
+ [941]  1600.333333  2046.333333  2026.333333  2033.666667  1997.000000
+ [946]  2712.666667  2478.000000  2399.666667  1955.666667  2788.333333
+ [951]  2630.666667  2850.333333  2252.666667  2628.000000  2222.333333
+ [956]  2470.333333  2251.666667  2786.000000  2156.333333  2130.333333
+ [961]  1573.333333  2240.666667  1859.333333  2163.000000  1965.666667
+ [966]  3029.666667  2798.000000  3023.000000  2322.000000  3063.000000
+ [971]  2526.000000  3088.666667  2732.333333  3925.666667  3173.000000
+ [976]  3248.000000  2663.666667  3814.333333  3328.000000  3330.000000
+ [981]  2856.333333  4116.666667  3447.000000  3337.666667  2631.333333
+ [986]  3743.333333  3047.000000  3196.000000  2732.000000  3910.666667
+ [991]  3188.333333  3305.000000  3057.666667  4657.000000  4180.666667
+ [996]  4295.000000  3732.666667  5000.666667  4231.666667  4527.666667
+[1001]  4169.000000  5869.333333  4959.666667  5526.666667  4960.000000
+[1006]  6657.000000  5232.666667  4998.333333  4105.000000  5934.666667
+[1011]  5028.333333  4547.666667  3190.666667  5148.666667  4302.333333
+[1016]  4581.666667  3130.000000  5082.666667  4127.333333  4404.666667
+[1021]  3680.000000  5501.000000  4937.000000  4907.000000  4308.000000
+[1026]  5557.000000  4697.000000  4948.333333  4587.333333  6375.000000
+[1031]  5184.000000  5363.333333  4593.333333  6708.333333  5540.000000
+[1036]  5421.000000  4477.000000  6319.666667  5212.333333  4579.000000
+[1041]  3753.333333  5865.000000  5031.000000  4663.000000  3922.333333
+[1046]  7359.333333  6860.333333  6324.666667  3989.000000  5928.666667
+[1051]  5311.666667  5197.000000  4418.000000  7212.000000  6580.333333
+[1056]  6237.666667  4938.666667  4059.000000  2618.333333  1935.333333
+[1061]  4661.666667 10044.333333  9121.000000  7735.666667  4067.333333
+[1066]  5659.333333  5063.666667  4207.000000  4152.666667  5983.666667
+[1071]  5585.333333  4823.000000  4518.666667  5964.000000  5607.666667
+[1076]  4761.333333  4982.000000  6866.666667  6750.333333  5834.333333
+[1081]  5816.000000  7118.333333  6780.333333  5607.000000  6279.666667
+[1086]  8079.666667  7541.333333  5650.666667  6431.666667  8519.666667
+[1091]  8256.000000  6219.333333  6437.666667  8797.333333  7838.666667
+[1096]  5697.666667  5444.666667  7212.666667  6551.333333  4718.000000
+[1101]  4980.333333  7287.333333  7362.666667  5806.666667  5722.000000
+[1106] 12817.000000 12754.000000 11072.000000  6144.000000  8334.666667
+[1111]  8588.666667  6463.666667  6518.000000  8852.333333  8616.000000
+[1116]  6748.666667  6356.333333  8525.000000  8328.666667  6072.666667
+[1121]  6299.333333  8694.666667  8360.333333  5452.333333  5044.000000
+[1126]  7202.666667  7185.666667  4498.666667  4404.666667  6275.000000
+[1131]  6832.333333  5142.000000  5762.333333  7468.000000  7532.666667
+[1136]  5265.333333  5473.000000  5907.000000  6494.000000  4566.000000
+[1141]  6262.333333  8501.333333  9086.000000  6765.333333  7163.333333
+[1146]  8608.666667  8837.000000  5544.333333  5620.666667  7069.333333
+[1151]  7009.333333  4429.000000  4724.666667  6667.666667  6737.000000
+[1156]  4316.000000  4675.666667  6065.000000  6994.333333  4737.000000
+[1161]  5987.333333  6887.000000  7578.333333  5022.000000  6376.000000
+[1166]  7386.666667  7920.666667  4903.000000  6755.333333  8287.333333
+[1171]  8600.000000  5022.666667  6373.666667  5165.333333  4637.666667
+[1176]   857.333333  4540.000000  7868.666667  8078.666667  4865.000000
+[1181]  3927.333333  5156.333333  5443.666667  3366.333333  4858.666667
+[1186]  5608.666667  6253.333333  3431.666667  5932.000000  7138.333333
+[1191]  8187.333333  5036.666667  6833.666667  7887.666667  8500.333333
+[1196]  5159.000000  7564.000000  9306.000000  9848.666667  5643.666667
+[1201]  8110.666667  6603.666667  6914.666667  1936.000000  7219.000000
+[1206] 10746.333333 10872.666667  6269.666667  5582.666667  7026.666667
+[1211]  7067.000000  3904.666667  5382.666667  6643.000000  7560.666667
+[1216]  4894.666667  7294.666667  7988.666667  8437.666667  4749.333333
+[1221]  7561.333333  8635.666667  9625.333333  5766.000000  9024.000000
+[1226] 10759.000000 10965.333333  5925.000000  9028.000000 10520.666667
+[1231] 11319.333333  5930.000000  8698.000000  9868.333333  9654.333333
+[1236]  4428.666667  7073.333333  8186.000000  8165.333333  3328.000000
+[1241]  6025.000000  7955.666667  8639.666667  4436.666667  6736.333333
+[1246]  8114.000000  8639.666667  4506.000000  6747.000000  7931.666667
+[1251]  8331.000000  4292.000000  6787.333333  8142.666667  8262.000000
+[1256]  4294.666667  8233.000000  9634.333333  9923.666667  4039.333333
+[1261]  6971.333333  8275.333333  8309.000000  3480.000000  5689.666667
+[1266]  6799.666667  6790.333333  2689.000000  5410.000000  6370.666667
+[1271]  6745.666667  2838.333333  5641.333333  6466.000000  6940.666667
+[1276]  3172.000000  5215.333333  6304.000000  6792.666667  3587.666667
+[1281]  6097.666667  7561.000000  8243.333333  4352.333333  7156.666667
+[1286]  7399.000000  7772.333333  2970.666667  6181.000000  7015.666667
+[1291]  7165.333333  3038.333333  5213.000000  6130.666667  6234.333333
+[1296]  2529.000000  5026.000000  5857.666667  6402.000000  2889.666667
+[1301]  5125.000000  5579.000000  6159.666667  3075.000000  5109.333333
+[1306]  5839.000000  6459.666667  3744.666667  6550.333333  7145.000000
+[1311]  7354.333333  3128.000000  5634.333333  6310.000000  5942.000000
+[1316]  1741.000000  4413.333333  5810.000000  7046.333333  3088.333333
+[1321]  5428.000000  5079.333333  5147.000000  2159.333333  4133.000000
+[1326]  4821.666667  4765.666667  2121.333333  3675.333333  4201.666667
+[1331]  4574.666667  2381.000000  3546.666667  4171.000000  4637.333333
+[1336]  2806.333333  3799.333333  4250.333333  4195.333333  2468.000000
+[1341]  3727.000000  4456.000000  4524.000000  2350.666667  4953.666667
+[1346]  5472.666667  5384.333333  1928.333333  4053.000000  4395.000000
+[1351]  4328.666667  1385.000000  3663.000000  3996.666667  4072.000000
+[1356]  1367.666667  3485.333333  4115.000000  4295.666667  1780.000000
+[1361]  2905.666667  3532.333333  3789.333333  2132.333333  4375.666667
+[1366]  4810.000000  4638.000000  2025.666667  3995.333333  4731.333333
+[1371]  4403.000000  1861.333333  3678.000000  4214.666667  4209.666667
+[1376]  1490.000000  3333.666667  3578.333333  3604.333333  1177.000000
+[1381]  2753.333333  3167.000000  3112.000000  1193.666667  2791.666667
+[1386]  3172.666667  3138.000000  1279.666667  2579.333333  2958.333333
+[1391]  2979.666667  1428.666667  4017.333333  4378.666667  4237.000000
+[1396]  1454.000000  3551.000000  4037.333333  3884.333333  1331.000000
+[1401]  3308.333333  3920.666667  3902.000000  1478.666667  2687.333333
+[1406]  2888.666667  2791.666667  1009.000000  2621.000000  2932.333333
+[1411]  3120.333333  1374.000000  3144.666667  3585.333333  3648.333333
+[1416]  1716.000000  2837.333333  3035.666667  2957.000000  1316.666667
+[1421]  3667.000000  4173.333333  4013.666667  1374.666667  3263.000000
+[1426]  3675.333333  3628.000000  1488.000000  3510.000000  3823.333333
+[1431]  3461.666667  1061.333333  3079.000000  3312.000000  3204.000000
+[1436]  1000.333333  2723.000000  3034.666667  2846.666667   952.333333
+[1441]  2595.333333  2947.666667  3607.666667  1882.000000  3500.333333
+[1446]  3263.333333  3169.333333  1416.333333  3231.666667  3549.333333
+[1451]  3384.666667  1362.000000  3454.000000  3767.000000  3475.000000
+[1456]  1025.333333  3150.666667  3478.666667  3347.333333   664.000000
+[1461]  2714.000000  2822.333333  2888.000000   963.000000  2532.000000
+[1466]  2859.333333  2406.333333   883.000000  2742.333333  3198.666667
+[1471]  3169.333333  1269.000000  2673.333333  3035.333333  2946.333333
+[1476]  1240.333333  3007.333333  3201.333333  3021.333333  1046.000000
+[1481]  3378.333333  3831.000000  3614.666667  1232.333333  2641.333333
+[1486]  2962.666667  2653.000000   913.333333  2623.000000  2798.000000
+[1491]  4045.333333  2107.666667  4183.000000  3047.333333  2918.666667
+[1496]   653.000000  2507.000000  2972.000000  3117.666667  1111.000000
+[1501]  2677.333333  2910.333333  2870.666667  1132.000000  2484.333333
+[1506]  2995.000000  2716.666667  1259.333333  2250.333333  2590.333333
+[1511]  2378.666667  1294.666667  3000.000000  3325.000000  2841.000000
+[1516]   803.000000  1553.666667  1740.000000  1662.000000   523.000000
+[1521]  1848.333333  2223.333333  2120.666667   795.000000  2580.666667
+[1526]  3119.666667  3116.666667  1547.333333  7733.000000  8041.666667
+[1531]  7486.333333  1072.000000  3350.333333  3708.333333  3542.000000
+[1536]  1013.000000  3180.333333  3947.000000  3745.666667  1747.333333
+[1541]  3744.333333  4143.666667  3580.666667   907.333333  3294.666667
+[1546]  3528.000000  3366.333333   796.333333  3447.333333  3870.333333
+[1551]  3610.000000   960.000000  2377.666667  3076.666667  2872.000000
+[1556]  1552.333333  3294.000000  3821.000000  3383.333333  1351.000000
+[1561]  3745.666667  4411.333333  4016.000000  1503.000000  3363.000000
+[1566]  3788.666667  3360.333333  1025.333333  3036.666667  3684.666667
+[1571]  3399.333333  1397.333333  3168.666667  3104.000000  2572.000000
+[1576]   351.333333  2590.333333  3526.666667  3277.000000  1451.000000
+[1581]  2513.666667  3072.000000  2771.666667  1060.333333  2586.666667
+[1586]  3162.000000  2992.666667  1748.333333  3970.666667  4730.000000
+[1591]  3930.333333  1655.000000  3593.666667  4136.333333  3619.333333
+[1596]  1093.000000  2954.000000  3518.666667  3296.000000  1392.000000
+[1601]  2901.666667  3416.333333  2868.000000  1055.666667  2356.666667
+[1606]  2944.000000  3041.333333  1658.000000  2694.333333  2997.000000
+[1611]  2553.333333  1605.000000  2825.000000  3471.333333  2879.000000
+[1616]  1503.666667  3093.000000  3674.000000  3190.000000  1533.000000
+[1621]  2908.333333  3435.333333  2933.666667  1159.000000  2620.333333
+[1626]  3113.333333  2881.333333  1031.666667  2237.666667  2506.333333
+[1631]  2264.000000  1050.666667  2417.666667  2924.666667  2750.666667
+[1636]  1652.333333  2661.333333  2780.000000  2290.000000  1231.666667
+[1641]  2050.333333  2509.333333  2242.000000  1561.666667  2724.333333
+[1646]  3071.666667  2476.333333  1380.333333  2422.333333  2875.666667
+[1651]  2353.000000  1137.000000  1928.666667  2297.000000  1974.000000
+[1656]  1183.333333  2024.666667  2238.000000  1713.333333   707.000000
+[1661]  1422.000000  1815.000000  1591.000000  1445.666667  2094.666667
+[1666]  2495.000000  1759.666667   919.333333  1399.333333  1848.333333
+[1671]  1717.666667  1712.333333  2425.333333  2877.333333  2019.000000
+[1676]  1344.333333  2013.000000  2390.333333  1906.666667  1100.333333
+[1681]  1870.666667  2310.666667  1949.000000  1069.000000  1451.000000
+[1686]  1683.333333  1341.666667   758.000000  1243.000000  1512.333333
+[1691]  1145.000000   695.333333  1108.333333  1536.666667  1393.666667
+[1696]  1036.666667  1399.666667  1662.333333  1463.000000  1355.000000
+[1701]  1749.000000  2023.000000  1444.333333  1238.666667  1598.000000
+[1706]  1959.000000  1427.000000   946.666667  1490.333333  1783.000000
+[1711]  1523.000000   995.666667  1364.333333  1547.666667  1101.000000
+[1716]   619.333333   908.333333  1110.666667   894.666667   747.333333
+[1721]   992.666667  1359.666667  1069.000000   995.000000  1206.000000
+[1726]  1573.333333  1545.666667  1459.333333  1711.000000  1716.666667
+[1731]  2761.000000  2528.000000  2820.666667  1519.333333  1689.666667
+[1736]  1369.000000  1618.000000  1252.333333   978.000000   619.666667
+[1741]   942.666667  1064.000000   896.666667   497.333333   751.000000
+[1746]   932.666667   814.666667   592.333333   865.666667  1084.666667
+[1751]   943.333333   695.333333   805.333333  1015.333333   860.000000
+[1756]   642.666667   885.666667  1175.333333  1099.333333  1070.333333
+[1761]  1199.333333  1386.333333   951.333333   678.000000   781.000000
+[1766]   986.333333   793.333333   525.000000   592.666667   755.000000
+[1771]   629.666667   433.666667   527.333333   672.333333   612.333333
+[1776]   747.333333   873.333333  1013.666667   647.000000   598.333333
+[1781]   650.000000   889.000000   738.000000   719.333333   772.333333
+[1786]   901.000000   701.666667   602.333333   668.333333   812.333333
+[1791]   530.000000   433.333333   502.000000   697.000000   483.666667
+[1796]   362.000000   449.666667   575.333333   408.333333   223.666667
+[1801]   272.666667   272.666667   388.000000   356.000000   515.333333
+[1806]   509.333333   551.000000   569.000000   496.000000   423.000000
+[1811]   389.000000   532.333333   584.000000   604.000000   512.000000
+[1816]   596.000000   685.000000   706.333333   459.333333   449.666667
+[1821]   526.666667   653.000000   410.333333   274.000000   311.333333
+[1826]   400.666667   499.333333   444.666667   528.333333   367.000000
+[1831]   330.000000   334.000000   402.000000   472.000000   396.666667
+[1836]   487.000000   487.000000   515.666667   369.000000   446.000000
+[1841]   498.666667   516.666667   360.333333   448.000000   562.000000
+[1846]   615.000000   344.333333   328.333333   356.000000   484.333333
+[1851]   271.666667   296.666667   289.333333   373.000000   388.000000
+[1856]   337.000000   379.000000   255.000000   281.666667   266.333333
+[1861]   319.333333   321.333333   264.333333   363.333333   360.000000
+[1866]   433.666667   222.333333   317.333333   338.000000   419.333333
+[1871]   340.333333   353.666667   410.666667   426.666667   265.666667
+[1876]   261.333333   263.666667   333.000000   199.000000   169.666667
+[1881]   196.000000   251.333333   269.666667   250.333333   287.333333
+[1886]   209.666667   133.333333   170.000000   217.666667   334.000000
+[1891]   332.000000   374.666667   341.666667   322.333333   191.000000
+[1896]   324.333333   344.333333   445.333333   408.666667   427.333333
+[1901]   440.666667   358.000000   211.666667   276.000000   293.666667
+[1906]   378.333333   199.666667   143.000000   183.000000   234.333333
+[1911]   348.333333   335.666667   391.333333   268.000000   156.000000
+[1916]   134.333333   166.666667   259.000000   351.000000   443.000000
+[1921]   442.333333   331.666667   158.333333   244.333333   310.000000
+[1926]   503.000000   430.333333   452.000000   417.000000   373.666667
+[1931]   219.666667   192.666667   224.000000   291.000000   160.000000
+[1936]   168.000000   205.000000   205.000000   104.000000    56.666667
+[1941]   182.000000   252.000000   195.333333   163.000000   195.333333
+[1946]   258.666667   703.333333   763.666667   814.000000   382.000000
+[1951]   219.333333   254.000000   360.666667   486.333333   724.666667
+[1956]   809.333333   935.000000   666.333333   547.333333   498.000000
+[1961]   623.333333   545.000000   343.000000   212.333333   383.000000
+[1966]   460.000000   550.666667   405.000000   542.000000   413.333333
+[1971]   288.666667   274.666667   422.666667   537.333333   803.333333
+[1976]   746.000000   873.000000   542.666667   699.000000   639.666667
+[1981]   813.666667   674.333333   825.000000   721.000000   748.333333
+[1986]   593.000000   687.666667   478.000000   774.000000   635.666667
+[1991]   877.000000   487.000000   706.000000   565.000000   720.666667
+[1996]   719.666667   933.000000   913.666667   997.333333   747.333333
+[2001]   898.000000   682.333333  1162.666667  1076.666667  1192.666667
+[2006]   910.333333  1148.000000  1061.333333  1336.666667  1088.333333
+[2011]  1388.666667  1030.000000  1322.000000  1011.666667  1462.666667
+[2016]   959.333333  1314.666667   914.333333  1363.666667   865.000000
+[2021]  1313.333333   966.333333  1310.000000  1121.000000  1464.666667
+[2026]  1178.000000  1578.666667  1171.333333  1539.666667  1089.666667
+[2031]  1897.000000  1772.333333  1933.333333  1510.000000  1995.333333
+[2036]  1808.666667  2204.666667  1696.333333  1283.000000   686.666667
+[2041]  1156.666667  1551.000000  3070.666667  2375.333333  3026.333333
+[2046]  1711.333333  2134.333333  1160.333333  1534.000000  1220.333333
+[2051]  1717.333333  1443.333333  1893.666667  1623.666667  2136.666667
+[2056]  1723.666667  2446.000000  1933.333333  2743.333333  2013.333333
+[2061]  2368.333333  1957.666667  2939.333333  2369.333333  2794.333333
+[2066]  2178.333333  3032.000000  2157.000000  2754.000000  2081.000000
+[2071]  3105.666667  2164.333333  3121.333333  2596.666667  2284.666667
+[2076]   860.000000  1300.000000  1771.000000  3309.000000  2830.666667
+[2081]  2920.000000  1717.333333  2255.000000  2012.333333  2163.333333
+[2086]  1667.000000  2633.000000  2446.000000  4078.666667  3926.000000
+[2091]  4928.000000  2909.000000  3401.333333  3103.000000  4042.666667
+[2096]  3026.000000  3480.000000  3062.000000  2455.333333   910.666667
+[2101]  1558.333333  2378.333333  4709.000000  3350.666667  3876.666667
+[2106]  2205.000000  2827.000000  2177.666667  2921.333333  2704.000000
+[2111]  3348.333333  2433.333333  3004.666667  2742.000000  3742.666667
+[2116]  3179.000000  3603.333333  3216.000000  3900.333333  2823.000000
+[2121]  3412.000000  3264.000000  4105.000000  2991.000000  3144.333333
+[2126]  3139.000000  4633.000000  3490.666667  4288.000000  3368.666667
+[2131]  4314.000000  2583.000000  2963.333333  2589.666667  3125.000000
+[2136]  2693.000000  3240.333333  3302.666667  2203.666667  1253.333333
+[2141]  1493.000000  2865.333333  2537.000000  1913.333333  1784.666667
+[2146]  3318.000000  6491.000000  5992.333333  6249.333333  4333.666667
+[2151]  5266.333333  3951.333333  4274.333333  4215.000000  5803.000000
+[2156]  4054.000000  4296.666667  3968.000000  4740.000000  2879.000000
+[2161]  2023.000000  2199.666667  3223.666667  3370.333333  4040.000000
+[2166]  4046.333333  4756.333333  3467.000000  3734.666667  3970.666667
+[2171]  4833.000000  4069.666667  3473.666667  4277.333333  5513.333333
+[2176]  5095.666667  4491.333333  5083.000000  5834.666667  4777.666667
+[2181]  4388.333333  4738.666667  5506.000000  3531.000000  2596.000000
+[2186]  3245.666667  4195.000000  3379.666667  3423.666667  4330.000000
+[2191]  4876.000000  3901.666667  3277.666667  3737.000000  3435.000000
+[2196]  2848.666667  2619.333333  3354.000000  4307.666667  3916.666667
+[2201]  3109.666667  3787.000000  4548.333333  4339.000000  4216.000000
+[2206]  5392.666667  6383.666667  4806.000000  4134.666667  5541.000000
+[2211]  6465.333333  4504.333333  3518.000000  4821.666667  5419.666667
+[2216]  3778.666667  2222.000000  3111.666667  3630.000000  3827.000000
+[2221]  4142.000000  5100.666667  4973.333333  4009.666667  3524.666667
+[2226]  4651.666667  5029.666667  4190.000000  3351.000000  4716.333333
+[2231]  5509.000000  4614.000000  4275.000000  5734.000000  6017.666667
+[2236]  4489.333333  3719.000000  5543.333333  5982.333333  3969.666667
+[2241]  2249.333333  3334.000000  4030.666667  3375.333333  3711.333333
+[2246]  4490.666667  4690.666667  3451.666667  3228.000000  4221.000000
+[2251]  3958.666667  3307.666667  3451.666667  4649.666667  5054.333333
+[2256]  3714.333333  2954.333333  4242.333333  4927.333333  4225.333333
+[2261]  3610.333333  4980.000000  5027.000000  3867.666667  3424.333333
+[2266]  4933.000000  5392.333333  3472.666667  2373.666667  3187.666667
+[2271]  3603.333333  2466.000000  2935.666667  3813.333333  4216.000000
+[2276]  3237.666667  2757.666667  3453.333333  2830.333333  2654.000000
+[2281]  3176.333333  4942.666667  4890.666667  3602.666667  2847.000000
+[2286]  4287.666667  4393.666667  3565.333333  3070.666667  4680.000000
+[2291]  4451.333333  3557.000000  3319.666667  4782.666667  4510.666667
+[2296]  2721.666667  1755.666667  3293.666667  3440.666667  2467.333333
+[2301]  1568.000000  2419.000000  2525.666667  2694.333333  3632.666667
+[2306]  4791.333333  4007.000000  2628.333333  2532.333333  3860.333333
+[2311]  3576.333333  2948.333333  3195.666667  4870.333333  4611.000000
+[2316]  3537.333333  3306.000000  4988.666667  4320.333333  3437.000000
+[2321]  3278.000000  5145.333333  4467.666667  2523.333333  1486.000000
+[2326]  2241.333333  2459.000000  1439.000000  1069.666667  2651.666667
+[2331]  2647.666667  3749.000000  4576.666667  5399.666667  3901.333333
+[2336]  1816.000000  1921.666667  3111.666667  2908.333333  2727.000000
+[2341]  2749.666667  4293.666667  3740.666667  3082.000000  2704.000000
+[2346]  4068.333333  3600.000000  3419.333333  3819.000000  5083.666667
+[2351]  4022.000000  2104.000000  1797.666667  2771.666667  2757.000000
+[2356]  1548.000000  1361.333333  2018.333333  2000.666667  2280.000000
+[2361]  3238.000000  4062.000000  3053.333333  2058.000000  2219.333333
+[2366]  3104.666667  2525.333333  2198.000000  2584.666667  3887.666667
+[2371]  3472.000000  2744.666667  2675.000000  3681.333333  3349.000000
+[2376]  2894.333333  2766.333333  3593.000000  2907.666667  1888.333333
+[2381]  1683.666667  2524.000000  2448.000000  1537.333333  1099.333333
+[2386]  1808.000000  1664.333333  2998.666667  3825.666667  4500.333333
+[2391]  2763.000000  1952.333333  2009.333333  2964.000000  4565.333333
+[2396]  4657.333333  4768.666667  3584.000000  3373.666667  3446.000000
+[2401]  3232.666667  3915.666667  2588.333333  2633.666667  3148.333333
+[2406]  4184.666667  3235.666667  1324.333333  1205.000000  2182.666667
+[2411]  2314.000000  1575.666667  1366.666667  2040.666667  1809.000000
+[2416]  2732.333333  3825.333333  4573.333333  2967.000000  2223.000000
+[2421]  2373.000000  3430.333333  2437.333333  2234.666667  2267.000000
+[2426]  3606.666667  3202.000000  3078.000000  3120.666667  4253.333333
+[2431]  3231.000000  3112.333333  3236.333333  4494.000000  3263.333333
+[2436]  1896.333333  1730.666667  2466.666667  2311.333333  1027.000000
+[2441]  1335.000000  2692.000000  2767.000000  4032.000000  4495.666667
+[2446]  5462.000000  3290.333333  2207.333333  2570.333333  3889.333333
+[2451]  3113.666667  2954.666667  2983.666667  4766.666667  3750.666667
+[2456]  3319.000000  3704.333333  5140.333333  4133.000000  3038.333333
+[2461]  3459.000000  5011.333333  4078.333333  2277.333333  2182.666667
+[2466]  3545.666667  3347.666667  1849.333333  1685.000000  2808.000000
+[2471]  2694.000000  3290.000000  4464.666667  5687.666667  3873.666667
+[2476]  2491.000000  2869.000000  4568.000000  3732.000000  3330.666667
+[2481]  3460.333333  5422.333333  4300.666667  3863.666667  4441.333333
+[2486]  6482.333333  5067.666667  3308.000000  3633.666667  5619.000000
+[2491]  4900.333333  2369.666667  2078.666667  3715.333333  3806.000000
+[2496]  2655.000000  3726.666667  4901.666667  4285.000000  3380.000000
+[2501]  3886.333333  5258.666667  3435.000000  2319.000000  2735.333333
+[2506]  4576.666667  4059.333333  3439.000000  3729.000000  5840.666667
+[2511]  4720.666667  3088.000000  3091.666667  2959.000000  2254.000000
+[2516]   436.333333  3169.666667  6217.333333  5900.000000  3296.333333
+[2521]  1331.000000  2619.333333  2542.000000  1765.000000  1859.666667
+[2526]  3222.333333  2975.666667  3069.333333  4373.000000  6224.666667
+[2531]  4788.000000  2940.333333  3244.666667  5334.000000  4641.666667
+[2536]  3212.333333  4070.666667  6873.333333  6343.666667  4585.000000
+[2541]  5380.666667  8168.666667  7019.000000  4136.333333  4840.000000
+[2546]  7836.333333  7101.333333  3354.000000  2706.666667  5145.000000
+[2551]  5265.333333  2964.000000  2976.333333  4634.000000  4481.666667
+[2556]  3336.333333  5401.333333  6948.333333  5693.666667  2977.333333
+[2561]  4182.333333  6597.666667  5700.000000  3618.000000  4076.333333
+[2566]  6749.666667  6169.000000  3963.666667  4954.666667  7605.000000
+[2571]  6924.000000  3798.000000  4736.000000  6991.666667  6462.000000
+[2576]  2690.666667  2861.666667  5314.666667  5424.666667  2920.333333
+[2581]  2657.666667  4205.000000  4183.333333  3079.666667  6445.333333
+[2586]  8220.000000  7447.333333  2957.666667  4062.000000  6817.666667
+[2591]  6500.000000  4160.666667  4981.000000  8294.666667  7929.000000
+[2596]  4492.666667  6803.333333 10465.666667 10077.000000  4823.666667
+[2601]  7743.666667 10782.666667 10426.666667  3721.000000  3819.000000
+[2606]  6966.333333  7001.666667  3787.000000  9829.000000 12191.333333
+[2611] 12150.333333  3938.000000  8204.666667 10714.666667  9925.000000
+[2616]  4150.000000 10274.666667 14024.000000 13472.666667  5834.666667
+[2621] 11154.000000 14955.333333 14461.333333  5788.666667 12785.666667
+[2626] 17428.666667 17436.666667  7737.666667 13271.666667 17254.333333
+[2631] 16484.666667  6026.666667  1222.000000   405.666667   287.666667
+[2636]   763.333333 29484.000000 36168.666667 36252.666667 10689.333333
+[2641] 13864.000000 16001.666667 14079.333333  5511.333333 19092.666667
+[2646] 22992.000000 23404.666667  9998.000000 24983.333333 29765.000000
+[2651] 29645.000000 12537.333333 29456.666667 33296.000000 32967.666667
+[2656] 12370.666667 32047.333333 36229.666667 33134.000000  6866.000000
+[2661] 27025.666667 27025.666667 31334.666667  5364.000000 26211.333333
+[2666] 34444.333333 34743.333333 21493.666667 29102.666667 34062.666667
+[2671] 28989.000000 11604.000000 22386.333333 26666.000000 27591.666667
+[2676] 13134.666667 31380.666667 34272.333333 35841.666667 13705.000000
+[2681] 33914.333333 36186.333333 37597.333333 14216.000000 35100.000000
+[2686] 37297.000000 36663.000000 10150.333333 33673.333333 36999.333333
+[2691] 40298.000000 11053.000000 31542.000000 33754.333333 35038.666667
+[2696] 22597.000000 35528.666667 39459.333333 28154.000000 16647.000000
+[2701] 27103.000000 30794.666667 26741.666667 15006.000000 26772.666667
+[2706] 29735.666667 25001.333333 11731.000000 25716.333333 32137.000000
+[2711] 27103.666667 10917.333333 20280.666667 34099.000000 29602.333333
+[2716] 13818.333333 15956.666667 32723.000000 50008.333333 35566.333333
+[2721] 35888.000000 27308.333333 28479.666667 19527.333333 19745.666667
+[2726] 23572.333333 17679.333333 12650.000000 13574.666667 16381.000000
+[2731] 18188.333333 13614.000000 16356.666667 17459.000000 19924.666667
+[2736] 17483.666667 20889.666667 22782.333333 22940.000000 17123.000000
+[2741] 19333.666667 20391.000000 21499.666667 12067.666667 14716.333333
+[2746] 14440.000000 17709.000000  8494.666667  9782.000000  9823.666667
+[2751] 11808.666667 14290.333333 15201.666667 16474.666667  7480.000000
+[2756]  5679.000000  7710.333333  9098.000000  6677.000000  3931.000000
+[2761]  7759.333333 14676.666667 12133.333333  9499.666667  8303.666667
+[2766] 12339.666667  9757.333333  7151.666667  7807.333333 10954.000000
+[2771] 25558.000000 19307.000000 20338.000000  5488.000000  9210.666667
+[2776]  6592.333333  5633.000000  5211.000000  5471.333333  8054.000000
+[2781]  9538.666667  9105.666667  6492.333333  4510.333333  5279.666667
+[2786]  5566.000000  6123.333333  5271.000000  5881.000000  6946.666667
+[2791]  5643.000000  4465.666667  5034.000000  6946.333333  9079.666667
+[2796]  7270.666667  7930.333333  5533.000000  4548.000000  1976.000000
+[2801]  2197.333333  2492.666667  2492.666667  1152.666667  3044.000000
+[2806]  3734.000000  4670.000000  3984.000000  4636.666667  4349.333333
+[2811]  3709.666667  3309.000000  3840.666667  3800.000000  4074.333333
+[2816]  3684.333333  4213.000000  4420.333333  4318.333333  3155.333333
+[2821]  4210.000000  4697.666667  4815.333333  3240.333333  3455.000000
+[2826]  3597.666667  3507.000000  2095.000000  1960.000000  1824.666667
+[2831]  1981.333333  1028.666667  2131.666667  2277.000000  2518.333333
+[2836]  2253.666667  2622.666667  2818.666667  2015.000000  1683.333333
+[2841]  2009.333333  2004.333333  2128.666667  1968.000000  2294.000000
+[2846]  2446.666667  2546.666667  2506.000000  2934.333333  2898.000000
+[2851]  2385.666667  1719.333333  2675.666667  2905.333333  2716.666667
+[2856]  1094.000000  1079.666667  1228.333333  1389.666667   694.333333
+[2861]   708.333333   846.666667   977.333333  1320.000000  2284.666667
+[2866]  2437.666667  1761.000000  1221.333333  1478.666667  1722.000000
+[2871]  1408.000000  1619.666667  1896.333333  1926.666667  1582.333333
+[2876]  1192.333333  1639.666667  1671.666667  1747.666667  1326.666667
+[2881]  1689.333333  1807.666667  1730.000000   926.333333   869.666667
+[2886]   923.333333  1043.333333   749.666667  1191.333333  1264.333333
+[2891]  1144.333333   985.333333  1215.000000  1391.000000   927.000000
+[2896]   855.666667  1038.000000  1126.333333  1195.333333  1051.666667
+[2901]  1260.000000  1230.666667  1203.000000  1027.000000  1444.333333
+[2906]  1589.000000  1397.333333   849.000000   706.000000   821.000000
+[2911]   561.666667   366.333333   913.333333  1200.666667  1140.333333
+[2916]   322.333333  1030.000000  1150.000000  2351.666667  2241.666667
+[2921]  2485.333333  1392.333333   717.666667   644.666667   845.333333
+[2926]   901.333333   789.333333   831.333333  1105.333333  1203.000000
+[2931]  1027.333333   799.666667  1108.000000  1186.666667  1055.666667
+[2936]   844.666667  1320.666667  1337.000000   963.333333   283.666667
+[2941]   420.333333   586.666667   501.000000   232.666667   959.000000
+[2946]  1064.666667  1168.666667   638.000000   893.666667   723.333333
+[2951]   433.666667   447.333333  1280.000000  1207.666667   978.666667
+[2956]   703.333333  1411.333333  1265.333333   883.666667   566.333333
+[2961]  1363.333333  1919.333333  1693.333333  1096.666667  1073.333333
+[2966]   908.666667   708.333333     0.000000   533.666667   533.666667
+[2971]   533.666667   164.000000  1275.666667  1275.666667  1236.666667
+[2976]   924.000000  1372.000000  1247.000000   514.666667   641.333333
+[2981]  1093.333333  1026.666667   513.666667   373.000000  1558.333333
+[2986]  1496.666667  1318.000000   789.333333  2020.666667  3110.666667
+[2991]  2508.666667  1946.666667  1850.666667  1796.000000  1126.666667
+[2996]     0.000000   586.333333   586.333333   586.333333     0.000000
+[3001]  1452.333333  1452.333333  2127.000000  1174.000000  1949.666667
+[3006]  1275.000000   870.333333   454.000000  1226.000000  1131.333333
+[3011]   856.333333   501.666667  1521.333333  1437.000000  1105.666667
+[3016]   512.333333  2149.333333  3097.666667  2718.333333  1509.333333
+[3021]  1771.333333  1724.333333  1296.333333     0.000000   792.333333
+[3026]   792.333333   792.333333    -4.000000   665.333333   665.333333
+[3031]   813.666667   543.333333  2674.333333  2530.000000  2209.666667
+[3036]   387.333333  1249.333333  1170.666667   935.333333  1290.000000
+[3041]  2462.000000  2388.666667  1239.000000   502.000000  2557.000000
+[3046]  3766.000000  3388.333333  2028.333333  2664.000000  2606.666667
+[3051]  1911.666667     0.000000  1087.666667  1087.666667  1087.666667
+[3056]     0.000000  1135.333333  1135.333333  1255.666667  1123.666667
+[3061]  4248.333333  4128.000000  3196.000000   402.000000  1571.333333
+[3066]  1500.000000  1221.333333   578.666667  2428.666667  2376.666667
+[3071]  1912.666667   624.333333  3102.333333  4642.333333  4154.000000
+[3076]  2340.666667  3033.333333  2960.000000  2295.333333     0.000000
+[3081]  1421.666667  1421.666667  1421.666667     0.000000  1117.333333
+[3086]  1117.333333  1117.333333   646.000000  4101.000000  4101.000000
+[3091]  3656.333333   950.000000  2504.000000  2302.666667  1605.000000
+[3096]   484.000000  2783.666667  2732.666667  2384.333333   883.666667
+[3101]  3258.000000  5470.000000  4756.666667  3131.000000  3654.333333
+[3106]  3568.666667  2820.000000    73.000000  1435.000000  1435.000000
+[3111]  1362.000000     1.666667  1403.333333  1403.333333  1628.000000
+[3116]   867.000000  4126.333333  3900.000000  3346.000000   591.666667
+[3121]  2192.333333  2105.666667  1668.000000   406.000000  2829.000000
+[3126]  2761.666667  2500.666667   517.000000  3801.000000  6633.666667
+[3131]  6268.333333  3864.000000  3888.000000  3814.000000  2934.333333
+[3136]     0.000000  1769.000000  1769.000000  1769.000000    89.000000
+[3141]  1596.000000  1596.000000  1653.000000   642.666667  4542.333333
+[3146]  4396.333333  3997.000000   594.666667  2619.333333  2522.000000
+[3151]  2138.666667   456.000000  3234.333333  3120.333333  2895.000000
+[3156]   596.000000  4176.000000  7730.333333  7331.666667  4212.000000
+[3161]  4253.000000  4172.333333  3712.000000    14.000000  2161.333333
+[3166]  2161.333333  2147.333333     0.000000  2133.333333  2133.333333
+[3171]  2316.000000   889.333333  6587.333333  6404.666667  5863.333333
+[3176]   882.000000  3102.666667  2937.333333  2352.000000   521.333333
+[3181]  3636.333333  3505.000000  3267.000000  2479.000000  7141.666667
+[3186] 12313.000000 10125.666667  6364.333333  2624.000000  2484.333333
+[3191]           NA           NA</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rollmean</span>(state_covid<span class="sc">$</span>newCases, <span class="at">k =</span> <span class="dv">3</span>, <span class="at">fill =</span> <span class="cn">NA</span>, <span class="at">align =</span> <span class="st">"right"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   [1]           NA           NA           NA     3.333333           NA
+   [6]           NA           NA    13.000000     9.333333    22.333333
+  [11]    15.000000    20.666667     7.000000    19.000000           NA
+  [16]           NA           NA    12.000000    16.000000    20.333333
+  [21]    20.666667    20.000000    41.666667    41.666667           NA
+  [26]           NA           NA    44.000000    36.333333    13.000000
+  [31]    73.333333    75.666667    71.000000    19.000000    55.333333
+  [36]    55.333333    46.333333    14.000000    83.000000    85.333333
+  [41]    80.333333    15.000000   152.333333   154.666667   151.333333
+  [46]    20.666667   352.333333   356.000000   354.000000    37.333333
+  [51]   621.000000   622.000000   610.666667    48.000000  1022.000000
+  [56]  1029.000000  1008.666667    61.666667  1131.333333  1149.000000
+  [61]  1120.666667    73.333333  1653.000000  1679.000000  1653.333333
+  [66]    91.000000  1960.000000  1978.000000  1950.000000   110.000000
+  [71]  1680.666667  1705.333333  1689.666667   146.000000  2577.000000
+  [76]  2576.666667  2569.333333   213.666667  2146.333333  2149.000000
+  [81]  2067.333333   188.000000  2030.666667  2089.333333  2015.333333
+  [86]   228.000000  3059.333333  3119.666667  3047.666667   208.666667
+  [91]  2210.000000  2259.666667  2214.000000   229.666667  2717.000000
+  [96]  2767.333333  2680.333333   227.333333  3040.333333  3111.666667
+ [101]  3027.333333   243.666667  2872.666667  2952.666667  2888.000000
+ [106]   297.666667  3180.000000  3244.333333  3205.333333   358.000000
+ [111]  3682.666667  3730.666667  3611.666667   299.333333  4254.333333
+ [116]  4364.333333  4303.000000   337.000000  2902.000000  2934.000000
+ [121]  2863.666667   230.333333  3230.333333  3311.000000  3301.000000
+ [126]   285.333333  2921.000000  2968.000000  2982.666667   286.666667
+ [131]  3365.000000  3386.666667  3424.666667   417.666667  3884.000000
+ [136]  3892.000000  3766.333333   280.666667  3757.333333  3822.666667
+ [141]  3804.666667   334.333333  3599.000000  3638.333333  3617.666667
+ [146]   367.666667  3055.333333  3066.333333  3003.666667   321.333333
+ [151]  2386.000000  2435.333333  2355.333333   256.000000  2600.000000
+ [156]  2652.333333  2665.000000   310.666667  4127.333333  4201.666667
+ [161]  4143.000000   356.333333  3063.000000  3216.333333  3140.666667
+ [166]   387.666667  2690.666667  2865.666667  2792.000000   410.000000
+ [171]  2595.333333  2916.666667  2848.000000   530.666667  2225.333333
+ [176]  2625.333333  2584.666667   643.666667  1806.000000  2186.666667
+ [181]  2144.333333   635.666667  1638.000000  1823.666667  1804.333333
+ [186]   506.666667  2124.333333  2160.666667  2091.000000   332.666667
+ [191]  2315.666667  2434.000000  2370.666667   588.000000  3157.666667
+ [196]  3251.333333  2982.666667   458.000000  3860.666667  3937.666667
+ [201]  3769.666667   366.333333  2231.333333  2287.333333  2169.000000
+ [206]   286.000000  1519.666667  1601.000000  1550.000000   336.000000
+ [211]  1310.333333  1388.000000  1301.333333   353.333333  1778.000000
+ [216]  1897.666667  1798.333333   401.333333  1790.666667  1984.333333
+ [221]  1884.000000   468.000000  1519.666667  1683.000000  1637.333333
+ [226]   496.666667  1777.666667  1869.333333  1809.333333   426.000000
+ [231]  1461.666667  1562.333333  1500.666667   358.333333  1006.666667
+ [236]  1118.666667  1136.333333   447.333333  1028.000000  1084.666667
+ [241]  1017.000000   404.333333  1154.666667  1272.333333  1236.000000
+ [246]   502.000000  1475.000000  1541.666667  1473.333333   449.666667
+ [251]  1222.333333  1405.000000  1347.666667   572.666667  1182.000000
+ [256]  1314.000000  1205.000000   409.333333   895.666667   951.666667
+ [261]   934.000000   287.333333   694.333333   835.666667   869.666667
+ [266]   436.333333   682.666667   740.000000   715.333333   349.000000
+ [271]   899.333333   977.333333   998.000000   414.000000  1045.333333
+ [276]  1123.666667  1090.666667   434.000000  1141.666667  1248.666667
+ [281]  1217.666667   430.333333   961.000000  1034.000000   934.000000
+ [286]   307.333333   767.666667   885.000000   888.333333   343.000000
+ [291]   607.000000   678.666667   687.000000   366.666667   683.000000
+ [296]   752.333333   884.333333   496.333333   823.000000   759.000000
+ [301]   774.666667   412.666667   944.000000  1067.000000  1021.666667
+ [306]   427.333333   743.000000   866.666667   928.000000   527.333333
+ [311]   903.000000   947.666667   898.666667   383.333333   712.666667
+ [316]   770.666667   870.666667   375.666667   634.333333   653.666667
+ [321]   836.333333   509.000000   668.333333   623.333333   651.666667
+ [326]   377.666667   578.666667   595.666667   687.666667   424.000000
+ [331]   865.666667   858.333333   911.666667   487.666667   845.333333
+ [336]   895.333333   842.666667   487.000000   724.333333   771.000000
+ [341]   808.000000   447.000000   659.000000   621.000000   721.666667
+ [346]   420.000000   575.333333   538.333333   551.000000   306.333333
+ [351]   603.000000   646.000000   602.333333   239.333333   465.000000
+ [356]   585.666667   568.666667   321.000000   524.666667   614.333333
+ [361]   619.333333   353.333333   537.333333   591.000000   724.666667
+ [366]   455.000000   657.333333   556.333333   631.000000   321.000000
+ [371]   462.333333   431.666667   522.333333   324.000000   439.666667
+ [376]   418.333333   523.333333   340.666667   450.333333   393.000000
+ [381]   527.333333   347.666667   460.666667   409.333333   644.333333
+ [386]   472.333333   576.000000   433.666667   672.666667   489.666667
+ [391]   620.333333   472.000000   710.666667   502.000000   666.000000
+ [396]   510.333333   783.333333   517.000000   607.000000   369.000000
+ [401]   550.333333   375.333333   483.000000   406.666667   563.666667
+ [406]   403.666667   471.000000   402.333333   488.000000   355.000000
+ [411]   397.333333   401.333333   622.333333   511.333333   582.666667
+ [416]   518.000000   707.333333   594.000000   625.333333   563.000000
+ [421]   650.000000   439.333333   472.000000   466.666667   570.000000
+ [426]   397.666667   442.333333   467.000000   548.000000   381.333333
+ [431]   384.333333   483.000000   642.333333   520.000000   476.333333
+ [436]   458.666667   718.333333   606.333333   601.333333   489.666667
+ [441]   783.000000   699.333333   734.666667   651.333333   869.000000
+ [446]   728.666667   699.333333   702.666667   897.000000   704.333333
+ [451]   607.666667   580.000000   624.000000   486.333333   422.000000
+ [456]   587.333333  1070.666667   931.000000   776.666667   444.333333
+ [461]   666.000000   603.333333   510.333333   468.000000   706.000000
+ [466]   658.000000   619.666667   672.666667   951.000000   849.333333
+ [471]   781.333333   832.000000  1309.000000  1109.000000   981.666667
+ [476]   760.666667  1002.333333   793.666667   671.666667   648.000000
+ [481]   914.000000   739.000000   609.000000   568.000000   809.666667
+ [486]   703.000000   552.333333   512.333333   742.666667   704.333333
+ [491]   632.666667   646.333333   905.000000   864.333333   778.666667
+ [496]   812.000000  1393.333333  1302.666667  1073.000000   719.000000
+ [501]  1024.000000  1030.000000   910.000000   973.666667  1251.333333
+ [506]  1129.000000   863.000000   836.000000  1241.666667  1099.333333
+ [511]   873.000000   785.666667  1338.333333  1235.333333   962.333333
+ [516]   730.000000  1176.666667  1143.000000  1027.000000   837.666667
+ [521]  1289.000000  1144.333333  1041.666667   876.333333  1390.333333
+ [526]  1304.666667  1121.666667   878.000000  1353.333333  1295.000000
+ [531]  1124.333333  1016.333333  1533.333333  1408.000000  1099.000000
+ [536]   898.666667  1357.000000  1230.000000   885.666667   663.333333
+ [541]  1166.333333  1152.333333   955.333333   740.666667  1074.000000
+ [546]  1068.666667   941.666667   801.666667  1119.000000  1032.333333
+ [551]   918.666667   942.666667  1544.000000  1529.333333  1290.333333
+ [556]   972.000000  1349.000000  1308.666667  1080.000000  1002.333333
+ [561]  1481.000000  1478.000000  1207.333333   978.333333  1116.666667
+ [566]  1039.666667   737.666667   646.000000  1080.666667  1023.000000
+ [571]   931.000000   692.000000   989.333333  1017.333333   827.666667
+ [576]   850.666667  1090.333333  1067.000000   864.000000   857.333333
+ [581]  1362.333333  1276.333333  1070.666667   988.333333  1491.000000
+ [586]  1434.666667  1071.000000   928.333333  1267.000000  1189.333333
+ [591]   929.666667   697.000000  1259.000000  1155.000000  1022.666667
+ [596]   639.000000   897.333333   827.000000   693.000000   598.000000
+ [601]   838.333333   782.000000   720.000000   754.000000   947.000000
+ [606]   915.333333   747.333333   829.666667  1258.666667  1209.000000
+ [611]  1040.666667   783.333333  1189.666667  1107.666667   959.000000
+ [616]   790.666667  1265.333333  1162.000000   996.000000   803.333333
+ [621]  1053.666667   921.000000   660.666667   566.666667  1026.000000
+ [626]   956.666667   823.000000   555.333333   730.666667   699.000000
+ [631]   627.000000   715.000000   899.000000   796.666667   667.000000
+ [636]   829.333333   966.333333   862.666667   634.000000   769.666667
+ [641]   888.666667   758.333333   607.000000   733.333333  1042.000000
+ [646]   894.333333   763.333333   712.000000   902.666667   763.333333
+ [651]   594.000000   514.000000   597.666667   462.333333   394.666667
+ [656]   462.666667   847.333333   805.000000   767.333333   602.000000
+ [661]   880.000000   749.000000   670.666667   617.666667   851.666667
+ [666]   757.000000   637.333333   687.666667   968.000000   892.666667
+ [671]   754.333333   707.666667   883.333333   741.333333   610.666667
+ [676]   683.666667   766.000000   716.333333   537.000000   573.333333
+ [681]   956.000000   848.666667   771.000000   504.000000   595.000000
+ [686]   619.000000   545.666667   649.666667  1161.666667  1008.666667
+ [691]   916.666667   609.000000  1142.000000  1072.666667   972.666667
+ [696]   797.666667  1065.000000   952.666667   749.666667   794.333333
+ [701]  1211.666667  1056.000000   835.666667   673.000000  1065.666667
+ [706]   917.000000   748.000000   606.666667   818.000000   675.666667
+ [711]   584.666667   608.666667  1034.000000   924.666667   878.666667
+ [716]   843.666667   944.333333   783.333333   535.666667   713.666667
+ [721]   971.000000   830.333333   740.666667   840.333333  1113.666667
+ [726]   931.333333   770.666667   845.333333  1201.666667  1027.666667
+ [731]   850.000000   827.000000   883.666667   705.333333   501.333333
+ [736]   588.666667   720.333333   543.000000   460.333333   500.000000
+ [741]   645.333333   530.333333   456.666667   464.333333   674.666667
+ [746]   585.000000   557.333333   611.333333   898.000000   802.000000
+ [751]   729.666667   720.666667  1005.000000   854.666667   768.000000
+ [756]   802.000000  1014.666667   871.000000   740.666667   840.333333
+ [761]  1066.666667   893.666667   721.333333   630.666667   755.333333
+ [766]   644.000000   560.333333   685.333333   788.666667   774.333333
+ [771]   670.333333   770.333333   898.333333   807.000000   691.000000
+ [776]   726.333333   785.333333   749.333333   702.666667   835.000000
+ [781]  1022.000000   945.666667   854.333333   822.666667  1035.000000
+ [786]   909.666667   900.333333   783.666667   910.666667   767.666667
+ [791]   739.000000   727.000000   815.000000   756.000000   693.666667
+ [796]   706.333333   745.000000   758.666667   723.666667   684.000000
+ [801]   668.333333   629.333333   623.000000   734.333333   874.000000
+ [806]   838.333333   855.000000   834.333333  1465.333333  1401.333333
+ [811]  1374.000000   940.000000   997.333333   850.000000   802.000000
+ [816]   862.666667   950.333333   781.333333   699.000000   722.333333
+ [821]   776.666667   652.333333   664.333333   774.666667   800.000000
+ [826]   685.000000   750.000000   928.000000  1146.666667   961.333333
+ [831]   928.000000   905.666667  1042.666667   918.666667  1019.666667
+ [836]  1114.333333  1221.333333  1004.000000  1095.333333  1275.666667
+ [841]  1592.666667  1217.333333  1295.000000  1120.000000  1224.666667
+ [846]   802.000000   825.000000   875.666667   903.666667   708.333333
+ [851]   707.000000   878.000000   919.333333   775.666667   888.000000
+ [856]  1078.333333  1223.333333  1050.333333  1057.333333  1218.333333
+ [861]  1112.333333   919.000000  1056.000000  1383.333333  1621.333333
+ [866]  1303.666667  1321.666667  1438.333333  1498.000000  1293.333333
+ [871]  1162.666667  1261.000000  1206.666667   959.000000   888.000000
+ [876]  1046.333333  1056.000000   924.000000   837.666667  1069.666667
+ [881]  1193.000000  1154.000000  1141.000000  1251.000000  1207.333333
+ [886]  1007.333333   936.666667  1355.000000  1486.333333  1487.333333
+ [891]  1295.666667  1626.666667  1618.000000  1553.000000  1394.666667
+ [896]  1706.666667  1713.000000  1509.333333  1389.333333  1704.666667
+ [901]  1662.000000  1399.000000  1117.666667  1317.000000  1270.333333
+ [906]  1115.000000   927.333333  1253.333333  1293.000000  1373.000000
+ [911]  1161.000000  1485.000000  1454.000000  1480.000000  1484.666667
+ [916]  1891.333333  1928.333333  1716.666667  1471.000000  1816.000000
+ [921]  2635.333333  2568.333333  2305.333333  1860.666667  2171.333333
+ [926]  2266.666667  2113.333333  2279.333333  1998.333333  1896.666667
+ [931]  1488.333333  1898.333333  1636.333333  1740.000000  1367.666667
+ [936]  1750.666667  1474.333333  1552.000000  1511.333333  1976.000000
+ [941]  1924.000000  1760.333333  1600.333333  2046.333333  2026.333333
+ [946]  2033.666667  1997.000000  2712.666667  2478.000000  2399.666667
+ [951]  1955.666667  2788.333333  2630.666667  2850.333333  2252.666667
+ [956]  2628.000000  2222.333333  2470.333333  2251.666667  2786.000000
+ [961]  2156.333333  2130.333333  1573.333333  2240.666667  1859.333333
+ [966]  2163.000000  1965.666667  3029.666667  2798.000000  3023.000000
+ [971]  2322.000000  3063.000000  2526.000000  3088.666667  2732.333333
+ [976]  3925.666667  3173.000000  3248.000000  2663.666667  3814.333333
+ [981]  3328.000000  3330.000000  2856.333333  4116.666667  3447.000000
+ [986]  3337.666667  2631.333333  3743.333333  3047.000000  3196.000000
+ [991]  2732.000000  3910.666667  3188.333333  3305.000000  3057.666667
+ [996]  4657.000000  4180.666667  4295.000000  3732.666667  5000.666667
+[1001]  4231.666667  4527.666667  4169.000000  5869.333333  4959.666667
+[1006]  5526.666667  4960.000000  6657.000000  5232.666667  4998.333333
+[1011]  4105.000000  5934.666667  5028.333333  4547.666667  3190.666667
+[1016]  5148.666667  4302.333333  4581.666667  3130.000000  5082.666667
+[1021]  4127.333333  4404.666667  3680.000000  5501.000000  4937.000000
+[1026]  4907.000000  4308.000000  5557.000000  4697.000000  4948.333333
+[1031]  4587.333333  6375.000000  5184.000000  5363.333333  4593.333333
+[1036]  6708.333333  5540.000000  5421.000000  4477.000000  6319.666667
+[1041]  5212.333333  4579.000000  3753.333333  5865.000000  5031.000000
+[1046]  4663.000000  3922.333333  7359.333333  6860.333333  6324.666667
+[1051]  3989.000000  5928.666667  5311.666667  5197.000000  4418.000000
+[1056]  7212.000000  6580.333333  6237.666667  4938.666667  4059.000000
+[1061]  2618.333333  1935.333333  4661.666667 10044.333333  9121.000000
+[1066]  7735.666667  4067.333333  5659.333333  5063.666667  4207.000000
+[1071]  4152.666667  5983.666667  5585.333333  4823.000000  4518.666667
+[1076]  5964.000000  5607.666667  4761.333333  4982.000000  6866.666667
+[1081]  6750.333333  5834.333333  5816.000000  7118.333333  6780.333333
+[1086]  5607.000000  6279.666667  8079.666667  7541.333333  5650.666667
+[1091]  6431.666667  8519.666667  8256.000000  6219.333333  6437.666667
+[1096]  8797.333333  7838.666667  5697.666667  5444.666667  7212.666667
+[1101]  6551.333333  4718.000000  4980.333333  7287.333333  7362.666667
+[1106]  5806.666667  5722.000000 12817.000000 12754.000000 11072.000000
+[1111]  6144.000000  8334.666667  8588.666667  6463.666667  6518.000000
+[1116]  8852.333333  8616.000000  6748.666667  6356.333333  8525.000000
+[1121]  8328.666667  6072.666667  6299.333333  8694.666667  8360.333333
+[1126]  5452.333333  5044.000000  7202.666667  7185.666667  4498.666667
+[1131]  4404.666667  6275.000000  6832.333333  5142.000000  5762.333333
+[1136]  7468.000000  7532.666667  5265.333333  5473.000000  5907.000000
+[1141]  6494.000000  4566.000000  6262.333333  8501.333333  9086.000000
+[1146]  6765.333333  7163.333333  8608.666667  8837.000000  5544.333333
+[1151]  5620.666667  7069.333333  7009.333333  4429.000000  4724.666667
+[1156]  6667.666667  6737.000000  4316.000000  4675.666667  6065.000000
+[1161]  6994.333333  4737.000000  5987.333333  6887.000000  7578.333333
+[1166]  5022.000000  6376.000000  7386.666667  7920.666667  4903.000000
+[1171]  6755.333333  8287.333333  8600.000000  5022.666667  6373.666667
+[1176]  5165.333333  4637.666667   857.333333  4540.000000  7868.666667
+[1181]  8078.666667  4865.000000  3927.333333  5156.333333  5443.666667
+[1186]  3366.333333  4858.666667  5608.666667  6253.333333  3431.666667
+[1191]  5932.000000  7138.333333  8187.333333  5036.666667  6833.666667
+[1196]  7887.666667  8500.333333  5159.000000  7564.000000  9306.000000
+[1201]  9848.666667  5643.666667  8110.666667  6603.666667  6914.666667
+[1206]  1936.000000  7219.000000 10746.333333 10872.666667  6269.666667
+[1211]  5582.666667  7026.666667  7067.000000  3904.666667  5382.666667
+[1216]  6643.000000  7560.666667  4894.666667  7294.666667  7988.666667
+[1221]  8437.666667  4749.333333  7561.333333  8635.666667  9625.333333
+[1226]  5766.000000  9024.000000 10759.000000 10965.333333  5925.000000
+[1231]  9028.000000 10520.666667 11319.333333  5930.000000  8698.000000
+[1236]  9868.333333  9654.333333  4428.666667  7073.333333  8186.000000
+[1241]  8165.333333  3328.000000  6025.000000  7955.666667  8639.666667
+[1246]  4436.666667  6736.333333  8114.000000  8639.666667  4506.000000
+[1251]  6747.000000  7931.666667  8331.000000  4292.000000  6787.333333
+[1256]  8142.666667  8262.000000  4294.666667  8233.000000  9634.333333
+[1261]  9923.666667  4039.333333  6971.333333  8275.333333  8309.000000
+[1266]  3480.000000  5689.666667  6799.666667  6790.333333  2689.000000
+[1271]  5410.000000  6370.666667  6745.666667  2838.333333  5641.333333
+[1276]  6466.000000  6940.666667  3172.000000  5215.333333  6304.000000
+[1281]  6792.666667  3587.666667  6097.666667  7561.000000  8243.333333
+[1286]  4352.333333  7156.666667  7399.000000  7772.333333  2970.666667
+[1291]  6181.000000  7015.666667  7165.333333  3038.333333  5213.000000
+[1296]  6130.666667  6234.333333  2529.000000  5026.000000  5857.666667
+[1301]  6402.000000  2889.666667  5125.000000  5579.000000  6159.666667
+[1306]  3075.000000  5109.333333  5839.000000  6459.666667  3744.666667
+[1311]  6550.333333  7145.000000  7354.333333  3128.000000  5634.333333
+[1316]  6310.000000  5942.000000  1741.000000  4413.333333  5810.000000
+[1321]  7046.333333  3088.333333  5428.000000  5079.333333  5147.000000
+[1326]  2159.333333  4133.000000  4821.666667  4765.666667  2121.333333
+[1331]  3675.333333  4201.666667  4574.666667  2381.000000  3546.666667
+[1336]  4171.000000  4637.333333  2806.333333  3799.333333  4250.333333
+[1341]  4195.333333  2468.000000  3727.000000  4456.000000  4524.000000
+[1346]  2350.666667  4953.666667  5472.666667  5384.333333  1928.333333
+[1351]  4053.000000  4395.000000  4328.666667  1385.000000  3663.000000
+[1356]  3996.666667  4072.000000  1367.666667  3485.333333  4115.000000
+[1361]  4295.666667  1780.000000  2905.666667  3532.333333  3789.333333
+[1366]  2132.333333  4375.666667  4810.000000  4638.000000  2025.666667
+[1371]  3995.333333  4731.333333  4403.000000  1861.333333  3678.000000
+[1376]  4214.666667  4209.666667  1490.000000  3333.666667  3578.333333
+[1381]  3604.333333  1177.000000  2753.333333  3167.000000  3112.000000
+[1386]  1193.666667  2791.666667  3172.666667  3138.000000  1279.666667
+[1391]  2579.333333  2958.333333  2979.666667  1428.666667  4017.333333
+[1396]  4378.666667  4237.000000  1454.000000  3551.000000  4037.333333
+[1401]  3884.333333  1331.000000  3308.333333  3920.666667  3902.000000
+[1406]  1478.666667  2687.333333  2888.666667  2791.666667  1009.000000
+[1411]  2621.000000  2932.333333  3120.333333  1374.000000  3144.666667
+[1416]  3585.333333  3648.333333  1716.000000  2837.333333  3035.666667
+[1421]  2957.000000  1316.666667  3667.000000  4173.333333  4013.666667
+[1426]  1374.666667  3263.000000  3675.333333  3628.000000  1488.000000
+[1431]  3510.000000  3823.333333  3461.666667  1061.333333  3079.000000
+[1436]  3312.000000  3204.000000  1000.333333  2723.000000  3034.666667
+[1441]  2846.666667   952.333333  2595.333333  2947.666667  3607.666667
+[1446]  1882.000000  3500.333333  3263.333333  3169.333333  1416.333333
+[1451]  3231.666667  3549.333333  3384.666667  1362.000000  3454.000000
+[1456]  3767.000000  3475.000000  1025.333333  3150.666667  3478.666667
+[1461]  3347.333333   664.000000  2714.000000  2822.333333  2888.000000
+[1466]   963.000000  2532.000000  2859.333333  2406.333333   883.000000
+[1471]  2742.333333  3198.666667  3169.333333  1269.000000  2673.333333
+[1476]  3035.333333  2946.333333  1240.333333  3007.333333  3201.333333
+[1481]  3021.333333  1046.000000  3378.333333  3831.000000  3614.666667
+[1486]  1232.333333  2641.333333  2962.666667  2653.000000   913.333333
+[1491]  2623.000000  2798.000000  4045.333333  2107.666667  4183.000000
+[1496]  3047.333333  2918.666667   653.000000  2507.000000  2972.000000
+[1501]  3117.666667  1111.000000  2677.333333  2910.333333  2870.666667
+[1506]  1132.000000  2484.333333  2995.000000  2716.666667  1259.333333
+[1511]  2250.333333  2590.333333  2378.666667  1294.666667  3000.000000
+[1516]  3325.000000  2841.000000   803.000000  1553.666667  1740.000000
+[1521]  1662.000000   523.000000  1848.333333  2223.333333  2120.666667
+[1526]   795.000000  2580.666667  3119.666667  3116.666667  1547.333333
+[1531]  7733.000000  8041.666667  7486.333333  1072.000000  3350.333333
+[1536]  3708.333333  3542.000000  1013.000000  3180.333333  3947.000000
+[1541]  3745.666667  1747.333333  3744.333333  4143.666667  3580.666667
+[1546]   907.333333  3294.666667  3528.000000  3366.333333   796.333333
+[1551]  3447.333333  3870.333333  3610.000000   960.000000  2377.666667
+[1556]  3076.666667  2872.000000  1552.333333  3294.000000  3821.000000
+[1561]  3383.333333  1351.000000  3745.666667  4411.333333  4016.000000
+[1566]  1503.000000  3363.000000  3788.666667  3360.333333  1025.333333
+[1571]  3036.666667  3684.666667  3399.333333  1397.333333  3168.666667
+[1576]  3104.000000  2572.000000   351.333333  2590.333333  3526.666667
+[1581]  3277.000000  1451.000000  2513.666667  3072.000000  2771.666667
+[1586]  1060.333333  2586.666667  3162.000000  2992.666667  1748.333333
+[1591]  3970.666667  4730.000000  3930.333333  1655.000000  3593.666667
+[1596]  4136.333333  3619.333333  1093.000000  2954.000000  3518.666667
+[1601]  3296.000000  1392.000000  2901.666667  3416.333333  2868.000000
+[1606]  1055.666667  2356.666667  2944.000000  3041.333333  1658.000000
+[1611]  2694.333333  2997.000000  2553.333333  1605.000000  2825.000000
+[1616]  3471.333333  2879.000000  1503.666667  3093.000000  3674.000000
+[1621]  3190.000000  1533.000000  2908.333333  3435.333333  2933.666667
+[1626]  1159.000000  2620.333333  3113.333333  2881.333333  1031.666667
+[1631]  2237.666667  2506.333333  2264.000000  1050.666667  2417.666667
+[1636]  2924.666667  2750.666667  1652.333333  2661.333333  2780.000000
+[1641]  2290.000000  1231.666667  2050.333333  2509.333333  2242.000000
+[1646]  1561.666667  2724.333333  3071.666667  2476.333333  1380.333333
+[1651]  2422.333333  2875.666667  2353.000000  1137.000000  1928.666667
+[1656]  2297.000000  1974.000000  1183.333333  2024.666667  2238.000000
+[1661]  1713.333333   707.000000  1422.000000  1815.000000  1591.000000
+[1666]  1445.666667  2094.666667  2495.000000  1759.666667   919.333333
+[1671]  1399.333333  1848.333333  1717.666667  1712.333333  2425.333333
+[1676]  2877.333333  2019.000000  1344.333333  2013.000000  2390.333333
+[1681]  1906.666667  1100.333333  1870.666667  2310.666667  1949.000000
+[1686]  1069.000000  1451.000000  1683.333333  1341.666667   758.000000
+[1691]  1243.000000  1512.333333  1145.000000   695.333333  1108.333333
+[1696]  1536.666667  1393.666667  1036.666667  1399.666667  1662.333333
+[1701]  1463.000000  1355.000000  1749.000000  2023.000000  1444.333333
+[1706]  1238.666667  1598.000000  1959.000000  1427.000000   946.666667
+[1711]  1490.333333  1783.000000  1523.000000   995.666667  1364.333333
+[1716]  1547.666667  1101.000000   619.333333   908.333333  1110.666667
+[1721]   894.666667   747.333333   992.666667  1359.666667  1069.000000
+[1726]   995.000000  1206.000000  1573.333333  1545.666667  1459.333333
+[1731]  1711.000000  1716.666667  2761.000000  2528.000000  2820.666667
+[1736]  1519.333333  1689.666667  1369.000000  1618.000000  1252.333333
+[1741]   978.000000   619.666667   942.666667  1064.000000   896.666667
+[1746]   497.333333   751.000000   932.666667   814.666667   592.333333
+[1751]   865.666667  1084.666667   943.333333   695.333333   805.333333
+[1756]  1015.333333   860.000000   642.666667   885.666667  1175.333333
+[1761]  1099.333333  1070.333333  1199.333333  1386.333333   951.333333
+[1766]   678.000000   781.000000   986.333333   793.333333   525.000000
+[1771]   592.666667   755.000000   629.666667   433.666667   527.333333
+[1776]   672.333333   612.333333   747.333333   873.333333  1013.666667
+[1781]   647.000000   598.333333   650.000000   889.000000   738.000000
+[1786]   719.333333   772.333333   901.000000   701.666667   602.333333
+[1791]   668.333333   812.333333   530.000000   433.333333   502.000000
+[1796]   697.000000   483.666667   362.000000   449.666667   575.333333
+[1801]   408.333333   223.666667   272.666667   272.666667   388.000000
+[1806]   356.000000   515.333333   509.333333   551.000000   569.000000
+[1811]   496.000000   423.000000   389.000000   532.333333   584.000000
+[1816]   604.000000   512.000000   596.000000   685.000000   706.333333
+[1821]   459.333333   449.666667   526.666667   653.000000   410.333333
+[1826]   274.000000   311.333333   400.666667   499.333333   444.666667
+[1831]   528.333333   367.000000   330.000000   334.000000   402.000000
+[1836]   472.000000   396.666667   487.000000   487.000000   515.666667
+[1841]   369.000000   446.000000   498.666667   516.666667   360.333333
+[1846]   448.000000   562.000000   615.000000   344.333333   328.333333
+[1851]   356.000000   484.333333   271.666667   296.666667   289.333333
+[1856]   373.000000   388.000000   337.000000   379.000000   255.000000
+[1861]   281.666667   266.333333   319.333333   321.333333   264.333333
+[1866]   363.333333   360.000000   433.666667   222.333333   317.333333
+[1871]   338.000000   419.333333   340.333333   353.666667   410.666667
+[1876]   426.666667   265.666667   261.333333   263.666667   333.000000
+[1881]   199.000000   169.666667   196.000000   251.333333   269.666667
+[1886]   250.333333   287.333333   209.666667   133.333333   170.000000
+[1891]   217.666667   334.000000   332.000000   374.666667   341.666667
+[1896]   322.333333   191.000000   324.333333   344.333333   445.333333
+[1901]   408.666667   427.333333   440.666667   358.000000   211.666667
+[1906]   276.000000   293.666667   378.333333   199.666667   143.000000
+[1911]   183.000000   234.333333   348.333333   335.666667   391.333333
+[1916]   268.000000   156.000000   134.333333   166.666667   259.000000
+[1921]   351.000000   443.000000   442.333333   331.666667   158.333333
+[1926]   244.333333   310.000000   503.000000   430.333333   452.000000
+[1931]   417.000000   373.666667   219.666667   192.666667   224.000000
+[1936]   291.000000   160.000000   168.000000   205.000000   205.000000
+[1941]   104.000000    56.666667   182.000000   252.000000   195.333333
+[1946]   163.000000   195.333333   258.666667   703.333333   763.666667
+[1951]   814.000000   382.000000   219.333333   254.000000   360.666667
+[1956]   486.333333   724.666667   809.333333   935.000000   666.333333
+[1961]   547.333333   498.000000   623.333333   545.000000   343.000000
+[1966]   212.333333   383.000000   460.000000   550.666667   405.000000
+[1971]   542.000000   413.333333   288.666667   274.666667   422.666667
+[1976]   537.333333   803.333333   746.000000   873.000000   542.666667
+[1981]   699.000000   639.666667   813.666667   674.333333   825.000000
+[1986]   721.000000   748.333333   593.000000   687.666667   478.000000
+[1991]   774.000000   635.666667   877.000000   487.000000   706.000000
+[1996]   565.000000   720.666667   719.666667   933.000000   913.666667
+[2001]   997.333333   747.333333   898.000000   682.333333  1162.666667
+[2006]  1076.666667  1192.666667   910.333333  1148.000000  1061.333333
+[2011]  1336.666667  1088.333333  1388.666667  1030.000000  1322.000000
+[2016]  1011.666667  1462.666667   959.333333  1314.666667   914.333333
+[2021]  1363.666667   865.000000  1313.333333   966.333333  1310.000000
+[2026]  1121.000000  1464.666667  1178.000000  1578.666667  1171.333333
+[2031]  1539.666667  1089.666667  1897.000000  1772.333333  1933.333333
+[2036]  1510.000000  1995.333333  1808.666667  2204.666667  1696.333333
+[2041]  1283.000000   686.666667  1156.666667  1551.000000  3070.666667
+[2046]  2375.333333  3026.333333  1711.333333  2134.333333  1160.333333
+[2051]  1534.000000  1220.333333  1717.333333  1443.333333  1893.666667
+[2056]  1623.666667  2136.666667  1723.666667  2446.000000  1933.333333
+[2061]  2743.333333  2013.333333  2368.333333  1957.666667  2939.333333
+[2066]  2369.333333  2794.333333  2178.333333  3032.000000  2157.000000
+[2071]  2754.000000  2081.000000  3105.666667  2164.333333  3121.333333
+[2076]  2596.666667  2284.666667   860.000000  1300.000000  1771.000000
+[2081]  3309.000000  2830.666667  2920.000000  1717.333333  2255.000000
+[2086]  2012.333333  2163.333333  1667.000000  2633.000000  2446.000000
+[2091]  4078.666667  3926.000000  4928.000000  2909.000000  3401.333333
+[2096]  3103.000000  4042.666667  3026.000000  3480.000000  3062.000000
+[2101]  2455.333333   910.666667  1558.333333  2378.333333  4709.000000
+[2106]  3350.666667  3876.666667  2205.000000  2827.000000  2177.666667
+[2111]  2921.333333  2704.000000  3348.333333  2433.333333  3004.666667
+[2116]  2742.000000  3742.666667  3179.000000  3603.333333  3216.000000
+[2121]  3900.333333  2823.000000  3412.000000  3264.000000  4105.000000
+[2126]  2991.000000  3144.333333  3139.000000  4633.000000  3490.666667
+[2131]  4288.000000  3368.666667  4314.000000  2583.000000  2963.333333
+[2136]  2589.666667  3125.000000  2693.000000  3240.333333  3302.666667
+[2141]  2203.666667  1253.333333  1493.000000  2865.333333  2537.000000
+[2146]  1913.333333  1784.666667  3318.000000  6491.000000  5992.333333
+[2151]  6249.333333  4333.666667  5266.333333  3951.333333  4274.333333
+[2156]  4215.000000  5803.000000  4054.000000  4296.666667  3968.000000
+[2161]  4740.000000  2879.000000  2023.000000  2199.666667  3223.666667
+[2166]  3370.333333  4040.000000  4046.333333  4756.333333  3467.000000
+[2171]  3734.666667  3970.666667  4833.000000  4069.666667  3473.666667
+[2176]  4277.333333  5513.333333  5095.666667  4491.333333  5083.000000
+[2181]  5834.666667  4777.666667  4388.333333  4738.666667  5506.000000
+[2186]  3531.000000  2596.000000  3245.666667  4195.000000  3379.666667
+[2191]  3423.666667  4330.000000  4876.000000  3901.666667  3277.666667
+[2196]  3737.000000  3435.000000  2848.666667  2619.333333  3354.000000
+[2201]  4307.666667  3916.666667  3109.666667  3787.000000  4548.333333
+[2206]  4339.000000  4216.000000  5392.666667  6383.666667  4806.000000
+[2211]  4134.666667  5541.000000  6465.333333  4504.333333  3518.000000
+[2216]  4821.666667  5419.666667  3778.666667  2222.000000  3111.666667
+[2221]  3630.000000  3827.000000  4142.000000  5100.666667  4973.333333
+[2226]  4009.666667  3524.666667  4651.666667  5029.666667  4190.000000
+[2231]  3351.000000  4716.333333  5509.000000  4614.000000  4275.000000
+[2236]  5734.000000  6017.666667  4489.333333  3719.000000  5543.333333
+[2241]  5982.333333  3969.666667  2249.333333  3334.000000  4030.666667
+[2246]  3375.333333  3711.333333  4490.666667  4690.666667  3451.666667
+[2251]  3228.000000  4221.000000  3958.666667  3307.666667  3451.666667
+[2256]  4649.666667  5054.333333  3714.333333  2954.333333  4242.333333
+[2261]  4927.333333  4225.333333  3610.333333  4980.000000  5027.000000
+[2266]  3867.666667  3424.333333  4933.000000  5392.333333  3472.666667
+[2271]  2373.666667  3187.666667  3603.333333  2466.000000  2935.666667
+[2276]  3813.333333  4216.000000  3237.666667  2757.666667  3453.333333
+[2281]  2830.333333  2654.000000  3176.333333  4942.666667  4890.666667
+[2286]  3602.666667  2847.000000  4287.666667  4393.666667  3565.333333
+[2291]  3070.666667  4680.000000  4451.333333  3557.000000  3319.666667
+[2296]  4782.666667  4510.666667  2721.666667  1755.666667  3293.666667
+[2301]  3440.666667  2467.333333  1568.000000  2419.000000  2525.666667
+[2306]  2694.333333  3632.666667  4791.333333  4007.000000  2628.333333
+[2311]  2532.333333  3860.333333  3576.333333  2948.333333  3195.666667
+[2316]  4870.333333  4611.000000  3537.333333  3306.000000  4988.666667
+[2321]  4320.333333  3437.000000  3278.000000  5145.333333  4467.666667
+[2326]  2523.333333  1486.000000  2241.333333  2459.000000  1439.000000
+[2331]  1069.666667  2651.666667  2647.666667  3749.000000  4576.666667
+[2336]  5399.666667  3901.333333  1816.000000  1921.666667  3111.666667
+[2341]  2908.333333  2727.000000  2749.666667  4293.666667  3740.666667
+[2346]  3082.000000  2704.000000  4068.333333  3600.000000  3419.333333
+[2351]  3819.000000  5083.666667  4022.000000  2104.000000  1797.666667
+[2356]  2771.666667  2757.000000  1548.000000  1361.333333  2018.333333
+[2361]  2000.666667  2280.000000  3238.000000  4062.000000  3053.333333
+[2366]  2058.000000  2219.333333  3104.666667  2525.333333  2198.000000
+[2371]  2584.666667  3887.666667  3472.000000  2744.666667  2675.000000
+[2376]  3681.333333  3349.000000  2894.333333  2766.333333  3593.000000
+[2381]  2907.666667  1888.333333  1683.666667  2524.000000  2448.000000
+[2386]  1537.333333  1099.333333  1808.000000  1664.333333  2998.666667
+[2391]  3825.666667  4500.333333  2763.000000  1952.333333  2009.333333
+[2396]  2964.000000  4565.333333  4657.333333  4768.666667  3584.000000
+[2401]  3373.666667  3446.000000  3232.666667  3915.666667  2588.333333
+[2406]  2633.666667  3148.333333  4184.666667  3235.666667  1324.333333
+[2411]  1205.000000  2182.666667  2314.000000  1575.666667  1366.666667
+[2416]  2040.666667  1809.000000  2732.333333  3825.333333  4573.333333
+[2421]  2967.000000  2223.000000  2373.000000  3430.333333  2437.333333
+[2426]  2234.666667  2267.000000  3606.666667  3202.000000  3078.000000
+[2431]  3120.666667  4253.333333  3231.000000  3112.333333  3236.333333
+[2436]  4494.000000  3263.333333  1896.333333  1730.666667  2466.666667
+[2441]  2311.333333  1027.000000  1335.000000  2692.000000  2767.000000
+[2446]  4032.000000  4495.666667  5462.000000  3290.333333  2207.333333
+[2451]  2570.333333  3889.333333  3113.666667  2954.666667  2983.666667
+[2456]  4766.666667  3750.666667  3319.000000  3704.333333  5140.333333
+[2461]  4133.000000  3038.333333  3459.000000  5011.333333  4078.333333
+[2466]  2277.333333  2182.666667  3545.666667  3347.666667  1849.333333
+[2471]  1685.000000  2808.000000  2694.000000  3290.000000  4464.666667
+[2476]  5687.666667  3873.666667  2491.000000  2869.000000  4568.000000
+[2481]  3732.000000  3330.666667  3460.333333  5422.333333  4300.666667
+[2486]  3863.666667  4441.333333  6482.333333  5067.666667  3308.000000
+[2491]  3633.666667  5619.000000  4900.333333  2369.666667  2078.666667
+[2496]  3715.333333  3806.000000  2655.000000  3726.666667  4901.666667
+[2501]  4285.000000  3380.000000  3886.333333  5258.666667  3435.000000
+[2506]  2319.000000  2735.333333  4576.666667  4059.333333  3439.000000
+[2511]  3729.000000  5840.666667  4720.666667  3088.000000  3091.666667
+[2516]  2959.000000  2254.000000   436.333333  3169.666667  6217.333333
+[2521]  5900.000000  3296.333333  1331.000000  2619.333333  2542.000000
+[2526]  1765.000000  1859.666667  3222.333333  2975.666667  3069.333333
+[2531]  4373.000000  6224.666667  4788.000000  2940.333333  3244.666667
+[2536]  5334.000000  4641.666667  3212.333333  4070.666667  6873.333333
+[2541]  6343.666667  4585.000000  5380.666667  8168.666667  7019.000000
+[2546]  4136.333333  4840.000000  7836.333333  7101.333333  3354.000000
+[2551]  2706.666667  5145.000000  5265.333333  2964.000000  2976.333333
+[2556]  4634.000000  4481.666667  3336.333333  5401.333333  6948.333333
+[2561]  5693.666667  2977.333333  4182.333333  6597.666667  5700.000000
+[2566]  3618.000000  4076.333333  6749.666667  6169.000000  3963.666667
+[2571]  4954.666667  7605.000000  6924.000000  3798.000000  4736.000000
+[2576]  6991.666667  6462.000000  2690.666667  2861.666667  5314.666667
+[2581]  5424.666667  2920.333333  2657.666667  4205.000000  4183.333333
+[2586]  3079.666667  6445.333333  8220.000000  7447.333333  2957.666667
+[2591]  4062.000000  6817.666667  6500.000000  4160.666667  4981.000000
+[2596]  8294.666667  7929.000000  4492.666667  6803.333333 10465.666667
+[2601] 10077.000000  4823.666667  7743.666667 10782.666667 10426.666667
+[2606]  3721.000000  3819.000000  6966.333333  7001.666667  3787.000000
+[2611]  9829.000000 12191.333333 12150.333333  3938.000000  8204.666667
+[2616] 10714.666667  9925.000000  4150.000000 10274.666667 14024.000000
+[2621] 13472.666667  5834.666667 11154.000000 14955.333333 14461.333333
+[2626]  5788.666667 12785.666667 17428.666667 17436.666667  7737.666667
+[2631] 13271.666667 17254.333333 16484.666667  6026.666667  1222.000000
+[2636]   405.666667   287.666667   763.333333 29484.000000 36168.666667
+[2641] 36252.666667 10689.333333 13864.000000 16001.666667 14079.333333
+[2646]  5511.333333 19092.666667 22992.000000 23404.666667  9998.000000
+[2651] 24983.333333 29765.000000 29645.000000 12537.333333 29456.666667
+[2656] 33296.000000 32967.666667 12370.666667 32047.333333 36229.666667
+[2661] 33134.000000  6866.000000 27025.666667 27025.666667 31334.666667
+[2666]  5364.000000 26211.333333 34444.333333 34743.333333 21493.666667
+[2671] 29102.666667 34062.666667 28989.000000 11604.000000 22386.333333
+[2676] 26666.000000 27591.666667 13134.666667 31380.666667 34272.333333
+[2681] 35841.666667 13705.000000 33914.333333 36186.333333 37597.333333
+[2686] 14216.000000 35100.000000 37297.000000 36663.000000 10150.333333
+[2691] 33673.333333 36999.333333 40298.000000 11053.000000 31542.000000
+[2696] 33754.333333 35038.666667 22597.000000 35528.666667 39459.333333
+[2701] 28154.000000 16647.000000 27103.000000 30794.666667 26741.666667
+[2706] 15006.000000 26772.666667 29735.666667 25001.333333 11731.000000
+[2711] 25716.333333 32137.000000 27103.666667 10917.333333 20280.666667
+[2716] 34099.000000 29602.333333 13818.333333 15956.666667 32723.000000
+[2721] 50008.333333 35566.333333 35888.000000 27308.333333 28479.666667
+[2726] 19527.333333 19745.666667 23572.333333 17679.333333 12650.000000
+[2731] 13574.666667 16381.000000 18188.333333 13614.000000 16356.666667
+[2736] 17459.000000 19924.666667 17483.666667 20889.666667 22782.333333
+[2741] 22940.000000 17123.000000 19333.666667 20391.000000 21499.666667
+[2746] 12067.666667 14716.333333 14440.000000 17709.000000  8494.666667
+[2751]  9782.000000  9823.666667 11808.666667 14290.333333 15201.666667
+[2756] 16474.666667  7480.000000  5679.000000  7710.333333  9098.000000
+[2761]  6677.000000  3931.000000  7759.333333 14676.666667 12133.333333
+[2766]  9499.666667  8303.666667 12339.666667  9757.333333  7151.666667
+[2771]  7807.333333 10954.000000 25558.000000 19307.000000 20338.000000
+[2776]  5488.000000  9210.666667  6592.333333  5633.000000  5211.000000
+[2781]  5471.333333  8054.000000  9538.666667  9105.666667  6492.333333
+[2786]  4510.333333  5279.666667  5566.000000  6123.333333  5271.000000
+[2791]  5881.000000  6946.666667  5643.000000  4465.666667  5034.000000
+[2796]  6946.333333  9079.666667  7270.666667  7930.333333  5533.000000
+[2801]  4548.000000  1976.000000  2197.333333  2492.666667  2492.666667
+[2806]  1152.666667  3044.000000  3734.000000  4670.000000  3984.000000
+[2811]  4636.666667  4349.333333  3709.666667  3309.000000  3840.666667
+[2816]  3800.000000  4074.333333  3684.333333  4213.000000  4420.333333
+[2821]  4318.333333  3155.333333  4210.000000  4697.666667  4815.333333
+[2826]  3240.333333  3455.000000  3597.666667  3507.000000  2095.000000
+[2831]  1960.000000  1824.666667  1981.333333  1028.666667  2131.666667
+[2836]  2277.000000  2518.333333  2253.666667  2622.666667  2818.666667
+[2841]  2015.000000  1683.333333  2009.333333  2004.333333  2128.666667
+[2846]  1968.000000  2294.000000  2446.666667  2546.666667  2506.000000
+[2851]  2934.333333  2898.000000  2385.666667  1719.333333  2675.666667
+[2856]  2905.333333  2716.666667  1094.000000  1079.666667  1228.333333
+[2861]  1389.666667   694.333333   708.333333   846.666667   977.333333
+[2866]  1320.000000  2284.666667  2437.666667  1761.000000  1221.333333
+[2871]  1478.666667  1722.000000  1408.000000  1619.666667  1896.333333
+[2876]  1926.666667  1582.333333  1192.333333  1639.666667  1671.666667
+[2881]  1747.666667  1326.666667  1689.333333  1807.666667  1730.000000
+[2886]   926.333333   869.666667   923.333333  1043.333333   749.666667
+[2891]  1191.333333  1264.333333  1144.333333   985.333333  1215.000000
+[2896]  1391.000000   927.000000   855.666667  1038.000000  1126.333333
+[2901]  1195.333333  1051.666667  1260.000000  1230.666667  1203.000000
+[2906]  1027.000000  1444.333333  1589.000000  1397.333333   849.000000
+[2911]   706.000000   821.000000   561.666667   366.333333   913.333333
+[2916]  1200.666667  1140.333333   322.333333  1030.000000  1150.000000
+[2921]  2351.666667  2241.666667  2485.333333  1392.333333   717.666667
+[2926]   644.666667   845.333333   901.333333   789.333333   831.333333
+[2931]  1105.333333  1203.000000  1027.333333   799.666667  1108.000000
+[2936]  1186.666667  1055.666667   844.666667  1320.666667  1337.000000
+[2941]   963.333333   283.666667   420.333333   586.666667   501.000000
+[2946]   232.666667   959.000000  1064.666667  1168.666667   638.000000
+[2951]   893.666667   723.333333   433.666667   447.333333  1280.000000
+[2956]  1207.666667   978.666667   703.333333  1411.333333  1265.333333
+[2961]   883.666667   566.333333  1363.333333  1919.333333  1693.333333
+[2966]  1096.666667  1073.333333   908.666667   708.333333     0.000000
+[2971]   533.666667   533.666667   533.666667   164.000000  1275.666667
+[2976]  1275.666667  1236.666667   924.000000  1372.000000  1247.000000
+[2981]   514.666667   641.333333  1093.333333  1026.666667   513.666667
+[2986]   373.000000  1558.333333  1496.666667  1318.000000   789.333333
+[2991]  2020.666667  3110.666667  2508.666667  1946.666667  1850.666667
+[2996]  1796.000000  1126.666667     0.000000   586.333333   586.333333
+[3001]   586.333333     0.000000  1452.333333  1452.333333  2127.000000
+[3006]  1174.000000  1949.666667  1275.000000   870.333333   454.000000
+[3011]  1226.000000  1131.333333   856.333333   501.666667  1521.333333
+[3016]  1437.000000  1105.666667   512.333333  2149.333333  3097.666667
+[3021]  2718.333333  1509.333333  1771.333333  1724.333333  1296.333333
+[3026]     0.000000   792.333333   792.333333   792.333333    -4.000000
+[3031]   665.333333   665.333333   813.666667   543.333333  2674.333333
+[3036]  2530.000000  2209.666667   387.333333  1249.333333  1170.666667
+[3041]   935.333333  1290.000000  2462.000000  2388.666667  1239.000000
+[3046]   502.000000  2557.000000  3766.000000  3388.333333  2028.333333
+[3051]  2664.000000  2606.666667  1911.666667     0.000000  1087.666667
+[3056]  1087.666667  1087.666667     0.000000  1135.333333  1135.333333
+[3061]  1255.666667  1123.666667  4248.333333  4128.000000  3196.000000
+[3066]   402.000000  1571.333333  1500.000000  1221.333333   578.666667
+[3071]  2428.666667  2376.666667  1912.666667   624.333333  3102.333333
+[3076]  4642.333333  4154.000000  2340.666667  3033.333333  2960.000000
+[3081]  2295.333333     0.000000  1421.666667  1421.666667  1421.666667
+[3086]     0.000000  1117.333333  1117.333333  1117.333333   646.000000
+[3091]  4101.000000  4101.000000  3656.333333   950.000000  2504.000000
+[3096]  2302.666667  1605.000000   484.000000  2783.666667  2732.666667
+[3101]  2384.333333   883.666667  3258.000000  5470.000000  4756.666667
+[3106]  3131.000000  3654.333333  3568.666667  2820.000000    73.000000
+[3111]  1435.000000  1435.000000  1362.000000     1.666667  1403.333333
+[3116]  1403.333333  1628.000000   867.000000  4126.333333  3900.000000
+[3121]  3346.000000   591.666667  2192.333333  2105.666667  1668.000000
+[3126]   406.000000  2829.000000  2761.666667  2500.666667   517.000000
+[3131]  3801.000000  6633.666667  6268.333333  3864.000000  3888.000000
+[3136]  3814.000000  2934.333333     0.000000  1769.000000  1769.000000
+[3141]  1769.000000    89.000000  1596.000000  1596.000000  1653.000000
+[3146]   642.666667  4542.333333  4396.333333  3997.000000   594.666667
+[3151]  2619.333333  2522.000000  2138.666667   456.000000  3234.333333
+[3156]  3120.333333  2895.000000   596.000000  4176.000000  7730.333333
+[3161]  7331.666667  4212.000000  4253.000000  4172.333333  3712.000000
+[3166]    14.000000  2161.333333  2161.333333  2147.333333     0.000000
+[3171]  2133.333333  2133.333333  2316.000000   889.333333  6587.333333
+[3176]  6404.666667  5863.333333   882.000000  3102.666667  2937.333333
+[3181]  2352.000000   521.333333  3636.333333  3505.000000  3267.000000
+[3186]  2479.000000  7141.666667 12313.000000 10125.666667  6364.333333
+[3191]  2624.000000  2484.333333</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(state_covid, <span class="fu">aes</span>(<span class="at">x =</span> date)) <span class="sc">+</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">y =</span> newCases), <span class="at">fill =</span> <span class="st">"pink"</span>, <span class="at">col =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> roll), <span class="at">col =</span> <span class="st">"darkred"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_linedraw</span>()<span class="sc">+</span></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>state, <span class="at">nrow =</span> <span class="dv">2</span>, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Cumulative COVID-19 Cases"</span>,</span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Date"</span>, <span class="at">y =</span> <span class="st">"Case Count"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 4 rows containing missing values or values outside the scale range
+(`geom_col()`).</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 7 rows containing missing values or values outside the scale range
+(`geom_line()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-03_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>pp <span class="ot">=</span> pop_data <span class="sc">%&gt;%</span> </span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STNAME) <span class="sc">%&gt;%</span> </span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">state_pop =</span> <span class="fu">sum</span>(POPESTIMATE2021)) <span class="sc">%&gt;%</span> </span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(state_covid, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"STNAME"</span><span class="ot">=</span><span class="st">"state"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">perCap =</span> newCases <span class="sc">/</span> state_pop) <span class="sc">%&gt;%</span> </span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(STNAME) <span class="sc">%&gt;%</span> </span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">roll =</span> zoo<span class="sc">::</span><span class="fu">rollmean</span>(perCap, <span class="at">k =</span> <span class="dv">7</span>, <span class="at">align =</span> <span class="st">"right"</span>, <span class="at">fill =</span> <span class="cn">NA</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pp, <span class="fu">aes</span>(<span class="at">x =</span> date)) <span class="sc">+</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> roll, <span class="at">col =</span> STNAME), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_linedraw</span>() <span class="sc">+</span></span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Cumulative COVID-19 Cases"</span>,</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Date"</span>, <span class="at">y =</span> <span class="st">"Case Count"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+ℹ Please use `linewidth` instead.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 28 rows containing missing values or values outside the scale range
+(`geom_line()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-03_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="question-7" class="level1">
+<h1>Question 7</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>meta <span class="ot">=</span> <span class="fu">read_csv</span>(<span class="st">'https://raw.githubusercontent.com/mikejohnson51/csu-ess-330/refs/heads/main/resources/county-centroids.csv'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(covid_data) <span class="sc">%&gt;%</span> </span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(date) <span class="sc">%&gt;%</span> </span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">wmX_c =</span> <span class="fu">sum</span>(LON<span class="sc">*</span>cases) <span class="sc">/</span> <span class="fu">sum</span>(cases),</span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">wmY_c =</span> <span class="fu">sum</span>(LAT<span class="sc">*</span>cases) <span class="sc">/</span> <span class="fu">sum</span>(cases),</span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">cases =</span> <span class="fu">sum</span>(cases)) <span class="sc">%&gt;%</span> </span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(date) <span class="sc">%&gt;%</span> </span>
+<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">d =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 3221 Columns: 3
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (1): fips
+dbl (2): LON, LAT
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Joining with `by = join_by(fips)`</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(meta) <span class="sc">+</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">borders</span>(<span class="st">"state"</span>,<span class="at">fill =</span> <span class="st">"gray90"</span>, <span class="at">colour =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> wmX_c, <span class="at">y =</span> wmY_c, <span class="at">size =</span> cases), <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">aplpha =</span>.<span class="dv">25</span>) <span class="sc">+</span></span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_linedraw</span>() <span class="sc">+</span></span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">color =</span> <span class="st">"Time"</span>,</span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">size =</span> <span class="st">"Cases"</span>,</span>
+<span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">""</span>,</span>
+<span id="cb64-8"><a href="#cb64-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Weighted Center of COVID-19 Cases"</span>) <span class="sc">+</span></span>
+<span id="cb64-9"><a href="#cb64-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in geom_point(aes(x = wmX_c, y = wmY_c, size = cases), color = "red", :
+Ignoring unknown parameters: `aplpha`</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lab-03_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">borders</span>(<span class="st">"state"</span>, <span class="at">fill =</span> <span class="st">"gray90"</span>, <span class="at">colour =</span> <span class="st">"white"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>mapping: group = ~group, x = ~long, y = ~lat 
+geom_polygon: na.rm = FALSE, rule = evenodd
+stat_identity: na.rm = FALSE
+position_identity </code></pre>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
