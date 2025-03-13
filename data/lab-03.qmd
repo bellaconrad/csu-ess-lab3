@@ -170,13 +170,15 @@ CO_death_analysis <- pop_and_covid %>%
   mutate(percentcoviddeath = (deaths/DEATHS2021)*100) %>% 
   mutate(high_impact_counties = (percentcoviddeath >= 20))
 
-ggplot(CO_death_analysis, aes(x = county, y = percentcoviddeath)) +
+plot1 <- ggplot(CO_death_analysis, aes(x = county, y = percentcoviddeath)) +
   geom_col(fill = "darkred") +
   labs(title = "Colorado Counties where over 20% of Deaths were Caused by COVID-19 in 2021",
        x = "County",
        y = "Percentage of Total Deaths Caused by COVID-19") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 6))
+ggsave("Colorado_Counties_20_COVID_deaths.png", plot = plot1, width = 10, height = 6, dpi = 300)
+print(plot1)
 ```
 
 
@@ -195,17 +197,19 @@ state_covid = covid_data %>%
          roll = zoo::rollmean(newCases, k = 7, align = "right", fill = NA)) %>% 
   ungroup()
 
-rollmean(state_covid$newCases, k = 3, fill = NA, align = "left")
+roll_left <- rollmean(state_covid$newCases, k = 3, fill = NA, align = "left")
 
-rollmean(state_covid$newCases, k = 3, fill = NA, align = "right")
+roll_right <- rollmean(state_covid$newCases, k = 3, fill = NA, align = "right")
 
-ggplot(state_covid, aes(x = date)) +
+plot2 <- ggplot(state_covid, aes(x = date)) +
   geom_col(aes(y = newCases), fill = "pink", col = NA) +
   geom_line(aes(y = roll), col = "darkred", linewidth = 1) +
   theme_linedraw()+
   facet_wrap(~state, nrow = 2, scales = "free_y") +
   labs(title = "Cumulative COVID-19 Cases",
        x = "Date", y = "Case Count")
+ggsave("Cumulative_COVID_cases.png", plot = plot2, width = 10, height = 6, dpi = 300)
+print(plot2)
 
 ```
 
@@ -221,11 +225,13 @@ pp = pop_data %>%
 ```
 
 ```{r}
-ggplot(pp, aes(x = date)) +
+plot3 <- ggplot(pp, aes(x = date)) +
   geom_line(aes(y = roll, col = STNAME), size = 1) +
   theme_linedraw() +
   labs(title = "Cumulative COVID-19 Cases",
        x = "Date", y = "Case Count")
+ggsave("Cumulative_COVID_cases2.png", plot = plot3, width = 10, height = 6, dpi = 300)
+print(plot3)
 ```
 
 
@@ -243,7 +249,7 @@ meta = read_csv('https://raw.githubusercontent.com/mikejohnson51/csu-ess-330/ref
   arrange(date) %>% 
   mutate(d = 1:n())
 
-ggplot(meta) +
+plot4 <- ggplot(meta) +
   borders("state",fill = "gray90", colour = "white") +
   geom_point(aes(x = wmX_c, y = wmY_c, size = cases), color = "red", aplpha =.25) +
   theme_linedraw() +
@@ -254,5 +260,8 @@ ggplot(meta) +
   theme(legend.position = "none")
 
 borders("state", fill = "gray90", colour = "white")
+
+ggsave("Weighted_US_Center_COVID.png", plot = plot4, width = 10, height = 6, dpi = 300)
+print(plot4)
 ```
 
