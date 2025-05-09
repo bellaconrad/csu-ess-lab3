@@ -187,7 +187,6 @@ print(plot1)
 
 
 ```{r}
-
 state_covid = covid_data %>% 
   group_by(date, state) %>% 
   summarise(cases = sum(cases)) %>% 
@@ -200,7 +199,10 @@ state_covid = covid_data %>%
 roll_left <- rollmean(state_covid$newCases, k = 3, fill = NA, align = "left")
 
 roll_right <- rollmean(state_covid$newCases, k = 3, fill = NA, align = "right")
+```
 
+
+```{r}
 plot2 <- ggplot(state_covid, aes(x = date)) +
   geom_col(aes(y = newCases), fill = "pink", col = NA) +
   geom_line(aes(y = roll), col = "darkred", linewidth = 1) +
